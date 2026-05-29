@@ -1,7 +1,6 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-
 const authRoutes = require('./routes/auth');
 const doctorRoutes = require('./routes/doctors');
 const patientRoutes = require('./routes/patients');
@@ -14,7 +13,12 @@ const PORT = process.env.PORT || 5000;
 
 app.use(cors({
   origin: process.env.FRONTEND_URL,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
+app.options('*', cors());
+
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);
