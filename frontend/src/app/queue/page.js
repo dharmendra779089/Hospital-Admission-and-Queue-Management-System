@@ -58,18 +58,15 @@ export default function QueueMonitor() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-1 max-w-7xl w-full mx-auto p-6 sm:p-8">
+
         <div className="glass p-6 sm:p-8 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-800 mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="flex items-center gap-3">
             <div className="p-3 bg-teal-500/10 text-teal-600 dark:text-teal-400 rounded-xl">
               <Monitor className="h-6 w-6" />
             </div>
             <div>
-              <h1 className="text-2xl font-extrabold text-slate-800 dark:text-slate-100">
-                Live Public Monitor Board
-              </h1>
-              <p className="text-xs text-slate-400 font-semibold mt-1">
-                Real-time physician calling boards. Auto-syncs every 3 seconds.
-              </p>
+              <h1 className="text-2xl font-extrabold text-slate-800 dark:text-slate-100">Live Public Monitor Board</h1>
+              <p className="text-xs text-slate-400 font-semibold mt-1">Real-time physician calling boards. Auto-syncs every 3 seconds.</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -86,9 +83,7 @@ export default function QueueMonitor() {
         {error && (
           <div className="p-4 mb-6 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-500 flex items-center gap-3 text-sm">
             <AlertCircle className="h-5 w-5 shrink-0" />
-            <div>
-              <strong>Sync Error:</strong> {error} - Please verify that the backend API server is online.
-            </div>
+            <div><strong>Sync Error:</strong> {error} - Please verify that the backend API server is online.</div>
           </div>
         )}
 
@@ -100,34 +95,23 @@ export default function QueueMonitor() {
           <div className="glass p-12 text-center rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
             <Bell className="h-12 w-12 text-slate-400 mx-auto animate-bounce" />
             <h3 className="mt-4 text-lg font-bold text-slate-800 dark:text-slate-100">No Active Tokens</h3>
-            <p className="mt-2 text-slate-500 text-sm max-w-md mx-auto">
-              No patient check-ins registered for today.
-            </p>
+            <p className="mt-2 text-slate-500 text-sm max-w-md mx-auto">No patient check-ins registered for today.</p>
           </div>
         ) : (
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             {Object.entries(groupedTokens).map(([docId, docInfo]) => (
-              <div
-                key={docId}
-                className="glass rounded-2xl shadow-lg border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col"
-              >
+              <div key={docId} className="glass rounded-2xl shadow-lg border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col">
                 <div className="bg-slate-500/5 p-5 border-b border-slate-200 dark:border-slate-800">
                   <h3 className="font-extrabold text-lg text-slate-800 dark:text-slate-100">{docInfo.doctorName}</h3>
-                  <p className="text-xs text-teal-600 dark:text-teal-400 font-bold uppercase tracking-wider mt-0.5">
-                    {docInfo.specialization}
-                  </p>
+                  <p className="text-xs text-teal-600 dark:text-teal-400 font-bold uppercase tracking-wider mt-0.5">{docInfo.specialization}</p>
                 </div>
                 <div className="p-6 flex-1 flex flex-col justify-between">
                   <div className="mb-6">
                     <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2.5">Now Calling</h4>
                     {docInfo.calling ? (
                       <div className="bg-teal-500/10 border border-teal-500/30 p-6 rounded-2xl text-center">
-                        <span className="block text-5xl font-black text-teal-600 dark:text-teal-400 tracking-wider animate-pulse">
-                          #{docInfo.calling.tokenNumber}
-                        </span>
-                        <span className="block text-xs font-bold text-slate-400 uppercase tracking-wide mt-2">
-                          Patient: {docInfo.calling.patient.name}
-                        </span>
+                        <span className="block text-5xl font-black text-teal-600 dark:text-teal-400 tracking-wider animate-pulse">#{docInfo.calling.tokenNumber}</span>
+                        <span className="block text-xs font-bold text-slate-400 uppercase tracking-wide mt-2">Patient: {docInfo.calling.patient.name}</span>
                       </div>
                     ) : (
                       <div className="bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl text-center">
@@ -141,10 +125,7 @@ export default function QueueMonitor() {
                     {docInfo.waiting.length > 0 ? (
                       <div className="flex flex-wrap gap-2">
                         {docInfo.waiting.map((token) => (
-                          <div
-                            key={token.id}
-                            className="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-300"
-                          >
+                          <div key={token.id} className="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-300">
                             #{token.tokenNumber}
                           </div>
                         ))}
@@ -158,6 +139,7 @@ export default function QueueMonitor() {
             ))}
           </div>
         )}
+
       </main>
     </div>
   );
