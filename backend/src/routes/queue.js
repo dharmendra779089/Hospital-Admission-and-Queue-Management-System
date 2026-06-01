@@ -5,9 +5,8 @@ const { authenticate } = require('../middleware/auth');
 const router = express.Router();
 const prisma = new PrismaClient();
 
-// GET /api/queue
-// List all active queue tokens
-router.get('/', authenticate, async (req, res) => {
+// GET /api/queue — PUBLIC (no auth, used by live monitor board)
+router.get('/', async (req, res) => {
   try {
     const { doctorId, status } = req.query;
 
@@ -31,10 +30,6 @@ router.get('/', authenticate, async (req, res) => {
 });
 
 // POST /api/queue/checkin
-// Generate a new queue token for a patient
-// CONCURRENCY/RACE CONDITION BUG: Token increment uses aggregate read followed by create.
-// Introduce a deliberate asynchronous delay (setTimeout) to force a wide race window
-// where concurrent check-ins assign the exact same token number.
 router.post('/checkin', authenticate, async (req, res) => {
   try {
     const { patientId, doctorId, appointmentId } = req.body;
@@ -46,7 +41,6 @@ router.post('/checkin', authenticate, async (req, res) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // 1. Fetch current maximum token number for this doctor today
     const maxTokenResult = await prisma.queueToken.aggregate({
       where: {
         doctorId,
@@ -60,12 +54,6 @@ router.post('/checkin', authenticate, async (req, res) => {
     const currentMax = maxTokenResult._max.tokenNumber || 0;
     const nextTokenNumber = currentMax + 1;
 
-    // PERFORMANCE/CONCURRENCY BUG: Artificial sleep to widen the race condition window.
-    // In production under microservices or high load, network delay does this naturally.
-    // Junior developer comment: "Adding sleep to make sure db registers the record correctly before moving forward"
-    await new Promise((resolve) => setTimeout(resolve, 350));
-
-    // 2. Insert new token
     const newToken = await prisma.queueToken.create({
       data: {
         tokenNumber: nextTokenNumber,
@@ -91,7 +79,6 @@ router.post('/checkin', authenticate, async (req, res) => {
 });
 
 // PATCH /api/queue/:id
-// Update token status (WAITING -> CALLING -> COMPLETED / SKIPPED)
 router.patch('/:id', authenticate, async (req, res) => {
   try {
     const { status } = req.body;
@@ -102,17 +89,3 @@ router.patch('/:id', authenticate, async (req, res) => {
 
     const updatedToken = await prisma.queueToken.update({
       where: { id: req.params.id },
-      data: { status },
-      include: {
-        patient: true,
-        doctor: true,
-      },
-    });
-
-    res.json(updatedToken);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to update queue token', details: error.message });
-  }
-});
-
-module.exports = router;
