@@ -3,7 +3,7 @@
 // Import useAuth custom context hook to access active user context
 import { useAuth } from '@/context/AuthContext';
 // Import next/link to handle SPA navigation links
-import { Link } from 'next/link';
+import Link from 'next/link';
 // Import Lucide icons for UI navigation and role badges
 import { Activity, LogOut, LayoutDashboard, MonitorPlay, Shield } from 'lucide-react';
 
