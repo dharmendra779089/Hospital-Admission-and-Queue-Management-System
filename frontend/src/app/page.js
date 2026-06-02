@@ -4,7 +4,7 @@
 // Import the client-side navigation component from Next.js
 import Link from 'next/link';
 // Import necessary modern iconography from the lucide-react icon pack
-import { Activity, ShieldAlert, MonitorPlay, Users, CalendarDays, ArrowRight } from 'lucide-react';
+import { Activity, MonitorPlay, Users, ArrowRight } from 'lucide-react';
 
 // Define and export the main Home landing page component
 export default function Home() {
@@ -77,28 +77,7 @@ export default function Home() {
             </div>
           </Link>
         </div>
-
-        {/* Attention container displaying important information regarding target evaluation bugs */}
-        <div className="mt-16 glass max-w-xl mx-auto p-6 rounded-2xl border border-rose-500/20 shadow-md flex gap-4 text-left">
-          {/* Rose-themed container enclosing the Alert alert symbol */}
-          <div className="p-2 bg-rose-500/10 text-rose-500 rounded-lg h-fit">
-            <ShieldAlert className="h-6 w-6" />
-          </div>
-          {/* Explanatory notes focusing on debugging goals */}
-          <div>
-            <h3 className="font-bold text-slate-800 dark:text-slate-100">Assessment Environment Notice</h3>
-            <p className="mt-1 text-slate-500 dark:text-slate-400 text-sm">
-              This repository contains critical architectural, database performance, frontend memory, and security bugs. 
-              Your evaluation criteria will measure your ability to identify, trace, profile, and fix these issues systematically.
-            </p>
-          </div>
-        </div>
       </div>
-
-      {/* Page footer containing copyright declaration and year helper */}
-      <footer className="text-center text-slate-400 dark:text-slate-500 text-xs mt-12">
-        HAQMS v1.0.0-deliberate-bugs &copy; {new Date().getFullYear()} Candidate Evaluation Framework.
-      </footer>
     </div>
   );
 }
