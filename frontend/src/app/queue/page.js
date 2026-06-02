@@ -61,7 +61,7 @@ export default function QueueMonitor() {
 
         <div className="glass p-6 sm:p-8 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-800 mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-teal-500/10 text-teal-600 dark:text-teal-400 rounded-xl">
+            <div className="p-3 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-xl">
               <Monitor className="h-6 w-6" />
             </div>
             <div>
@@ -70,7 +70,7 @@ export default function QueueMonitor() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-500/15 text-teal-600 dark:text-teal-400 text-xs font-bold uppercase tracking-wide border border-teal-500/20">
+            <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 text-xs font-bold uppercase tracking-wide border border-indigo-500/20">
               <RefreshCw className="h-3.5 w-3.5 animate-spin" />
               Auto Refreshing
             </span>
@@ -103,14 +103,14 @@ export default function QueueMonitor() {
               <div key={docId} className="glass rounded-2xl shadow-lg border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col">
                 <div className="bg-slate-500/5 p-5 border-b border-slate-200 dark:border-slate-800">
                   <h3 className="font-extrabold text-lg text-slate-800 dark:text-slate-100">{docInfo.doctorName}</h3>
-                  <p className="text-xs text-teal-600 dark:text-teal-400 font-bold uppercase tracking-wider mt-0.5">{docInfo.specialization}</p>
+                  <p className="text-xs text-indigo-600 dark:text-indigo-400 font-bold uppercase tracking-wider mt-0.5">{docInfo.specialization}</p>
                 </div>
                 <div className="p-6 flex-1 flex flex-col justify-between">
                   <div className="mb-6">
                     <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2.5">Now Calling</h4>
                     {docInfo.calling ? (
-                      <div className="bg-teal-500/10 border border-teal-500/30 p-6 rounded-2xl text-center">
-                        <span className="block text-5xl font-black text-teal-600 dark:text-teal-400 tracking-wider animate-pulse">#{docInfo.calling.tokenNumber}</span>
+                      <div className="bg-indigo-500/10 border border-indigo-500/30 p-6 rounded-2xl text-center">
+                        <span className="block text-5xl font-black text-indigo-600 dark:text-indigo-400 tracking-wider animate-pulse">#{docInfo.calling.tokenNumber}</span>
                         <span className="block text-xs font-bold text-slate-400 uppercase tracking-wide mt-2">Patient: {docInfo.calling.patient.name}</span>
                       </div>
                     ) : (

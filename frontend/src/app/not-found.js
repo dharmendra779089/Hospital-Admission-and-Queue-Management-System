@@ -7,7 +7,7 @@ export default function NotFound() {
   return (
     <div className="flex flex-col min-h-screen justify-center items-center py-12 px-6 lg:px-8 text-center">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <Link href="/" className="inline-flex items-center gap-2 text-teal-600 dark:text-teal-400 font-extrabold text-3xl mb-8">
+        <Link href="/" className="inline-flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-extrabold text-3xl mb-8">
           <Activity className="h-8 w-8 animate-pulse" />
           HAQMS
         </Link>
@@ -31,7 +31,7 @@ export default function NotFound() {
           <div className="mt-8">
             <Link
               href="/dashboard"
-              className="glow-btn inline-flex items-center justify-center gap-2 py-2.5 px-4 border border-transparent rounded-lg shadow-md text-sm font-bold text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-all duration-300 w-full"
+              className="glow-btn inline-flex items-center justify-center gap-2 py-2.5 px-4 border border-transparent rounded-lg shadow-md text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300 w-full"
             >
               <ArrowLeft className="h-4 w-4" />
               Back to Dashboard

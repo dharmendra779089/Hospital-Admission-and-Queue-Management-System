@@ -76,7 +76,7 @@ export default function PatientHistoryRecords({ params }) {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           <button
             onClick={() => router.push('/dashboard')}
-            className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-teal-600 dark:hover:text-teal-400 transition-colors group"
+            className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors group"
           >
             <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
             Back to Registry Dashboard
@@ -85,7 +85,7 @@ export default function PatientHistoryRecords({ params }) {
           {patient && (
             <button
               onClick={handlePrint}
-              className="glow-btn flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white dark:bg-teal-500 dark:text-slate-950 dark:hover:bg-teal-400 font-extrabold text-xs rounded-xl shadow-md transition-all duration-300"
+              className="glow-btn flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white dark:bg-indigo-500 dark:text-slate-950 dark:hover:bg-indigo-400 font-extrabold text-xs rounded-xl shadow-md transition-all duration-300"
             >
               <Printer className="h-4 w-4" />
               Print Diagnostic History
@@ -94,7 +94,7 @@ export default function PatientHistoryRecords({ params }) {
         </div>
 
         {printSuccess && (
-          <div className="p-3 mb-6 rounded-xl bg-teal-500/10 border border-teal-500/20 text-teal-600 dark:text-teal-400 flex items-center gap-2 text-xs font-bold animate-pulse">
+          <div className="p-3 mb-6 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center gap-2 text-xs font-bold animate-pulse">
             <CheckCircle2 className="h-4 w-4" />
             Generating report printing payload...
           </div>
@@ -121,16 +121,16 @@ export default function PatientHistoryRecords({ params }) {
             
             {/* Patient Header Block */}
             <div className="glass p-6 sm:p-8 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-800 relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-6 opacity-5 dark:opacity-10 text-teal-500">
+              <div className="absolute top-0 right-0 p-6 opacity-5 dark:opacity-10 text-indigo-500">
                 <HeartPulse className="h-24 w-24" />
               </div>
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div className="flex items-center gap-4">
-                  <div className="p-4 bg-teal-500/10 text-teal-600 dark:text-teal-400 rounded-2xl border border-teal-500/20 shadow-inner">
+                  <div className="p-4 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-2xl border border-indigo-500/20 shadow-inner">
                     <User className="h-8 w-8" />
                   </div>
                   <div>
-                    <span className="text-xxs font-extrabold uppercase tracking-widest text-teal-600 dark:text-teal-400 bg-teal-500/10 px-2 py-0.5 rounded border border-teal-500/20">
+                    <span className="text-xxs font-extrabold uppercase tracking-widest text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
                       Legacy App Clinical File
                     </span>
                     <h1 className="text-3xl font-black text-slate-800 dark:text-slate-100 mt-2.5 leading-tight">
@@ -161,7 +161,7 @@ export default function PatientHistoryRecords({ params }) {
               {/* Medical History Sidebar */}
               <div className="glass p-6 rounded-2xl shadow-md border border-slate-200 dark:border-slate-800 h-fit space-y-4">
                 <h3 className="text-sm font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                  <Activity className="h-4.5 w-4.5 text-teal-600" />
+                  <Activity className="h-4.5 w-4.5 text-indigo-600" />
                   Clinical Anamnesis
                 </h3>
                 <div className="p-4 rounded-xl bg-slate-500/5 border border-slate-200 dark:border-slate-800/60">
@@ -174,7 +174,7 @@ export default function PatientHistoryRecords({ params }) {
               {/* Chronological Consultation Timeline */}
               <div className="md:col-span-2 glass p-6 sm:p-8 rounded-2xl shadow-md border border-slate-200 dark:border-slate-800 space-y-6">
                 <h3 className="text-sm font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                  <FileText className="h-4.5 w-4.5 text-teal-600" />
+                  <FileText className="h-4.5 w-4.5 text-indigo-600" />
                   Consultation Archive Timeline
                 </h3>
 
@@ -189,17 +189,17 @@ export default function PatientHistoryRecords({ params }) {
                       <div key={appt.id} className="relative group">
                         
                         {/* Timeline Connector Dot */}
-                        <span className={`absolute -left-9 top-1.5 p-1 rounded-full border bg-slate-50 dark:bg-slate-950 transition-all ${appt.status === 'COMPLETED' ? 'border-teal-500 text-teal-500' : appt.status === 'CANCELLED' ? 'border-rose-500 text-rose-500' : 'border-amber-500 text-amber-500'}`}>
+                        <span className={`absolute -left-9 top-1.5 p-1 rounded-full border bg-slate-50 dark:bg-slate-950 transition-all ${appt.status === 'COMPLETED' ? 'border-indigo-500 text-indigo-500' : appt.status === 'CANCELLED' ? 'border-rose-500 text-rose-500' : 'border-amber-500 text-amber-500'}`}>
                           <div className="h-2 w-2 rounded-full bg-current" />
                         </span>
 
-                        <div className="glass p-5 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-teal-500/30 dark:hover:border-teal-500/20 hover:shadow-md transition-all duration-300">
+                        <div className="glass p-5 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-indigo-500/30 dark:hover:border-indigo-500/20 hover:shadow-md transition-all duration-300">
                           <div className="flex justify-between items-start gap-4 flex-wrap">
                             <span className="text-xxs font-mono font-bold text-slate-400 flex items-center gap-1.5">
                               <Calendar className="h-3.5 w-3.5" />
                               {new Date(appt.appointmentDate).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
                             </span>
-                            <span className={`px-2 py-0.5 rounded text-xxs font-extrabold uppercase tracking-wide ${appt.status === 'COMPLETED' ? 'bg-teal-500/10 text-teal-600 dark:text-teal-400' : appt.status === 'CANCELLED' ? 'bg-rose-500/10 text-rose-500' : 'bg-amber-500/10 text-amber-500'}`}>
+                            <span className={`px-2 py-0.5 rounded text-xxs font-extrabold uppercase tracking-wide ${appt.status === 'COMPLETED' ? 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400' : appt.status === 'CANCELLED' ? 'bg-rose-500/10 text-rose-500' : 'bg-amber-500/10 text-amber-500'}`}>
                               {appt.status}
                             </span>
                           </div>

@@ -388,13 +388,13 @@ export default function Dashboard() {
             <>
               <button
                 onClick={() => setActiveTab('reports')}
-                className={`py-3.5 px-1 border-b-2 font-bold text-sm transition-all whitespace-nowrap ${activeTab === 'reports' ? 'border-teal-500 text-teal-600 dark:text-teal-400' : 'border-transparent text-slate-400'}`}
+                className={`py-3.5 px-1 border-b-2 font-bold text-sm transition-all whitespace-nowrap ${activeTab === 'reports' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-slate-400'}`}
               >
                 System Audit Reports
               </button>
               <button
                 onClick={() => setActiveTab('physicians')}
-                className={`py-3.5 px-1 border-b-2 font-bold text-sm transition-all whitespace-nowrap ${activeTab === 'physicians' ? 'border-teal-500 text-teal-600 dark:text-teal-400' : 'border-transparent text-slate-400'}`}
+                className={`py-3.5 px-1 border-b-2 font-bold text-sm transition-all whitespace-nowrap ${activeTab === 'physicians' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-slate-400'}`}
               >
                 Physician Registry
               </button>
@@ -405,13 +405,13 @@ export default function Dashboard() {
             <>
               <button
                 onClick={() => setActiveTab('patients')}
-                className={`py-3.5 px-1 border-b-2 font-bold text-sm transition-all whitespace-nowrap ${activeTab === 'patients' ? 'border-teal-500 text-teal-600 dark:text-teal-400' : 'border-transparent text-slate-400'}`}
+                className={`py-3.5 px-1 border-b-2 font-bold text-sm transition-all whitespace-nowrap ${activeTab === 'patients' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-slate-400'}`}
               >
                 Patient Registry Directory
               </button>
               <button
                 onClick={() => setActiveTab('book')}
-                className={`py-3.5 px-1 border-b-2 font-bold text-sm transition-all whitespace-nowrap ${activeTab === 'book' ? 'border-teal-500 text-teal-600 dark:text-teal-400' : 'border-transparent text-slate-400'}`}
+                className={`py-3.5 px-1 border-b-2 font-bold text-sm transition-all whitespace-nowrap ${activeTab === 'book' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-slate-400'}`}
               >
                 Scheduling / Check-in Portal
               </button>
@@ -422,13 +422,13 @@ export default function Dashboard() {
             <>
               <button
                 onClick={() => setActiveTab('appointments')}
-                className={`py-3.5 px-1 border-b-2 font-bold text-sm transition-all whitespace-nowrap ${activeTab === 'appointments' ? 'border-teal-500 text-teal-600 dark:text-teal-400' : 'border-transparent text-slate-400'}`}
+                className={`py-3.5 px-1 border-b-2 font-bold text-sm transition-all whitespace-nowrap ${activeTab === 'appointments' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-slate-400'}`}
               >
                 My Scheduled Bookings
               </button>
               <button
                 onClick={() => setActiveTab('queue')}
-                className={`py-3.5 px-1 border-b-2 font-bold text-sm transition-all whitespace-nowrap ${activeTab === 'queue' ? 'border-teal-500 text-teal-600 dark:text-teal-400' : 'border-transparent text-slate-400'}`}
+                className={`py-3.5 px-1 border-b-2 font-bold text-sm transition-all whitespace-nowrap ${activeTab === 'queue' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-slate-400'}`}
               >
                 Active Calling Queue
               </button>
@@ -438,7 +438,7 @@ export default function Dashboard() {
 
         {/* Global Notifications Panel */}
         {checkinMessage && (
-          <div className="p-4 mb-6 rounded-xl bg-teal-500/10 border border-teal-500/20 text-teal-600 dark:text-teal-400 flex items-center justify-between text-sm">
+          <div className="p-4 mb-6 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-between text-sm">
             <span>{checkinMessage}</span>
             <button onClick={() => setCheckinMessage('')} className="font-bold underline text-xs">Dismiss</button>
           </div>
@@ -454,7 +454,7 @@ export default function Dashboard() {
               <div className="lg:col-span-2 space-y-6">
                 <div className="glass p-6 rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
                   <h3 className="text-lg font-extrabold text-slate-800 dark:text-slate-100 flex items-center gap-2 mb-4">
-                    <ClipboardList className="h-5 w-5 text-teal-600" />
+                    <ClipboardList className="h-5 w-5 text-indigo-600" />
                     Patient Lookup Directory
                   </h3>
 
@@ -469,7 +469,7 @@ export default function Dashboard() {
                         value={patientSearchInput}
                         onChange={(e) => setPatientSearchInput(e.target.value)}
                         placeholder="Search by name, phone or email..."
-                        className="block w-full pl-9 pr-3 py-2 border border-slate-300 dark:border-slate-700 bg-white/50 dark:bg-slate-900/50 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm"
+                        className="block w-full pl-9 pr-3 py-2 border border-slate-300 dark:border-slate-700 bg-white/50 dark:bg-slate-900/50 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
                       />
                     </div>
 
@@ -515,7 +515,7 @@ export default function Dashboard() {
                               <td className="py-3.5 text-right space-x-2">
                                 <button
                                   onClick={() => handleQueueCheckin(p.id, doctorsList[0]?.id)}
-                                  className="text-xxs px-2.5 py-1 rounded bg-teal-500/10 text-teal-600 dark:text-teal-400 font-bold hover:bg-teal-500 hover:text-white transition-colors"
+                                  className="text-xxs px-2.5 py-1 rounded bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold hover:bg-indigo-500 hover:text-white transition-colors"
                                 >
                                   Check In
                                 </button>
@@ -543,14 +543,14 @@ export default function Dashboard() {
                       <button
                         disabled={patientsPagination.page <= 1}
                         onClick={() => fetchPatients(patientsPagination.page - 1)}
-                        className="px-3 py-1 rounded border border-slate-200 dark:border-slate-700 hover:bg-teal-500/10 disabled:opacity-50 text-xs font-semibold"
+                        className="px-3 py-1 rounded border border-slate-200 dark:border-slate-700 hover:bg-indigo-500/10 disabled:opacity-50 text-xs font-semibold"
                       >
                         Prev
                       </button>
                       <button
                         disabled={patientsPagination.page >= patientsPagination.totalPages}
                         onClick={() => fetchPatients(patientsPagination.page + 1)}
-                        className="px-3 py-1 rounded border border-slate-200 dark:border-slate-700 hover:bg-teal-500/10 disabled:opacity-50 text-xs font-semibold"
+                        className="px-3 py-1 rounded border border-slate-200 dark:border-slate-700 hover:bg-indigo-500/10 disabled:opacity-50 text-xs font-semibold"
                       >
                         Next
                       </button>
@@ -562,12 +562,12 @@ export default function Dashboard() {
               {/* Registration Form */}
               <div className="glass p-6 rounded-2xl shadow-md border border-slate-200 dark:border-slate-800 h-fit">
                 <h3 className="text-lg font-extrabold text-slate-800 dark:text-slate-100 flex items-center gap-2 mb-4">
-                  <UserPlus className="h-5 w-5 text-teal-600" />
+                  <UserPlus className="h-5 w-5 text-indigo-600" />
                   New Registration
                 </h3>
 
                 {regMessage && (
-                  <div className={`p-3 text-sm rounded-lg mb-4 ${regMessage.startsWith('Success') ? 'bg-teal-500/15 text-teal-600 dark:text-teal-400 border border-teal-500/20' : 'bg-rose-500/15 text-rose-500 border border-rose-500/20'}`}>
+                  <div className={`p-3 text-sm rounded-lg mb-4 ${regMessage.startsWith('Success') ? 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20' : 'bg-rose-500/15 text-rose-500 border border-rose-500/20'}`}>
                     {regMessage}
                   </div>
                 )}
@@ -647,7 +647,7 @@ export default function Dashboard() {
 
                   <button
                     type="submit"
-                    className="glow-btn w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-extrabold text-sm rounded-lg shadow-md transition-colors duration-300 mt-2"
+                    className="glow-btn w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-sm rounded-lg shadow-md transition-colors duration-300 mt-2"
                   >
                     Register Patient Record
                   </button>
@@ -665,12 +665,12 @@ export default function Dashboard() {
             {/* Book Appointment Card */}
             <div className="glass p-6 rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
               <h3 className="text-lg font-extrabold text-slate-800 dark:text-slate-100 flex items-center gap-2 mb-4">
-                <CalendarDays className="h-5 w-5 text-teal-600" />
+                <CalendarDays className="h-5 w-5 text-indigo-600" />
                 Schedule Appointment Slot
               </h3>
 
               {bookingMessage && (
-                <div className={`p-3 text-sm rounded-lg mb-4 ${bookingMessage.startsWith('Success') ? 'bg-teal-500/15 text-teal-600 dark:text-teal-400 border border-teal-500/20' : 'bg-rose-500/15 text-rose-500 border border-rose-500/20'}`}>
+                <div className={`p-3 text-sm rounded-lg mb-4 ${bookingMessage.startsWith('Success') ? 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20' : 'bg-rose-500/15 text-rose-500 border border-rose-500/20'}`}>
                   {bookingMessage}
                 </div>
               )}
@@ -731,7 +731,7 @@ export default function Dashboard() {
 
                 <button
                   type="submit"
-                  className="glow-btn w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-extrabold text-sm rounded-lg shadow-md transition-colors duration-300 mt-2"
+                  className="glow-btn w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-sm rounded-lg shadow-md transition-colors duration-300 mt-2"
                 >
                   Book Appointment Slot
                 </button>
@@ -741,7 +741,7 @@ export default function Dashboard() {
             {/* Quick Walkin Checkin Token Board */}
             <div className="glass p-6 rounded-2xl shadow-md border border-slate-200 dark:border-slate-800">
               <h3 className="text-lg font-extrabold text-slate-800 dark:text-slate-100 flex items-center gap-2 mb-4">
-                <Activity className="h-5 w-5 text-teal-600" />
+                <Activity className="h-5 w-5 text-indigo-600" />
                 Active Direct Queue Check-In
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 mb-6 font-semibold">
@@ -749,9 +749,9 @@ export default function Dashboard() {
               </p>
 
               <div className="space-y-6">
-                <div className="p-4 rounded-xl border border-teal-500/25 bg-teal-500/10 text-slate-700 dark:text-slate-300 text-xs leading-5">
+                <div className="p-4 rounded-xl border border-indigo-500/25 bg-indigo-500/10 text-slate-700 dark:text-slate-300 text-xs leading-5">
                   <strong>Token Generation Engine Note:</strong> Direct arrivals bypass appointments. The token engine uses a database transaction to safely increment tokens.
-                  <span className="block mt-1 font-bold text-teal-600 uppercase tracking-wide">Race condition fixed — atomic transaction used.</span>
+                  <span className="block mt-1 font-bold text-indigo-600 uppercase tracking-wide">Race condition fixed — atomic transaction used.</span>
                 </div>
 
                 <div className="space-y-4 text-xs font-semibold text-slate-700 dark:text-slate-300">
@@ -791,7 +791,7 @@ export default function Dashboard() {
                       }
                       handleQueueCheckin(pId, dId);
                     }}
-                    className="glow-btn w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white dark:bg-teal-500 dark:text-slate-950 dark:hover:bg-teal-400 font-extrabold text-sm rounded-lg shadow-md transition-colors duration-300 mt-2"
+                    className="glow-btn w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white dark:bg-indigo-500 dark:text-slate-950 dark:hover:bg-indigo-400 font-extrabold text-sm rounded-lg shadow-md transition-colors duration-300 mt-2"
                   >
                     Generate Live Token
                   </button>
@@ -808,7 +808,7 @@ export default function Dashboard() {
           <div className="space-y-6">
             <div className="glass p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-md">
               <h3 className="text-lg font-extrabold text-slate-800 dark:text-slate-100 flex items-center gap-2 mb-4">
-                <CalendarDays className="h-5 w-5 text-teal-600" />
+                <CalendarDays className="h-5 w-5 text-indigo-600" />
                 Scheduled Daily Bookings List
               </h3>
 
@@ -835,7 +835,7 @@ export default function Dashboard() {
                           <td className="py-3.5">
                             <button
                               onClick={() => setSelectedPatientHistory(app.patient)}
-                              className="font-bold text-teal-600 hover:underline hover:text-teal-700 transition-colors"
+                              className="font-bold text-indigo-600 hover:underline hover:text-indigo-700 transition-colors"
                             >
                               {app.patient ? app.patient.name : 'Unknown Patient'}
                             </button>
@@ -843,7 +843,7 @@ export default function Dashboard() {
                           </td>
                           <td className="py-3.5 text-slate-500 dark:text-slate-400 font-semibold">{app.reason || 'None provided'}</td>
                           <td className="py-3.5">
-                            <span className={`inline-flex px-2 py-0.5 rounded text-xxs font-extrabold tracking-wide uppercase ${app.status === 'COMPLETED' ? 'bg-teal-500/10 text-teal-600' : app.status === 'CANCELLED' ? 'bg-rose-500/10 text-rose-500' : 'bg-amber-500/10 text-amber-500'}`}>
+                            <span className={`inline-flex px-2 py-0.5 rounded text-xxs font-extrabold tracking-wide uppercase ${app.status === 'COMPLETED' ? 'bg-indigo-500/10 text-indigo-600' : app.status === 'CANCELLED' ? 'bg-rose-500/10 text-rose-500' : 'bg-amber-500/10 text-amber-500'}`}>
                               {app.status}
                             </span>
                           </td>
@@ -855,13 +855,13 @@ export default function Dashboard() {
                                     const matchedDoc = doctorsList.find((d) => d.userId === user.id);
                                     if (matchedDoc) handleQueueCheckin(app.patientId, matchedDoc.id, app.id);
                                   }}
-                                  className="text-xxs px-2.5 py-1 rounded bg-teal-500/10 text-teal-600 dark:text-teal-400 font-extrabold hover:bg-teal-500 hover:text-white transition-colors"
+                                  className="text-xxs px-2.5 py-1 rounded bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-extrabold hover:bg-indigo-500 hover:text-white transition-colors"
                                 >
                                   Check In Patient
                                 </button>
                                 <button
                                   onClick={() => handleCompleteAppointment(app.id)}
-                                  className="text-xxs px-2.5 py-1 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-extrabold hover:bg-teal-500 hover:text-white transition-colors"
+                                  className="text-xxs px-2.5 py-1 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-extrabold hover:bg-indigo-500 hover:text-white transition-colors"
                                 >
                                   Complete
                                 </button>
@@ -907,7 +907,7 @@ export default function Dashboard() {
                 <div className="pt-2 flex justify-between items-center text-xs">
                   <Link
                     href={`/patients/${selectedPatientHistory.id}/history-records`}
-                    className="text-teal-600 font-extrabold hover:underline flex items-center gap-1"
+                    className="text-indigo-600 font-extrabold hover:underline flex items-center gap-1"
                   >
                     View Diagnostic Reports Details (Legacy App)
                     <ArrowRight className="h-3 w-3" />
@@ -924,7 +924,7 @@ export default function Dashboard() {
         {activeTab === 'queue' && (
           <div className="glass p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-md">
             <h3 className="text-lg font-extrabold text-slate-800 dark:text-slate-100 flex items-center gap-2 mb-4">
-              <Clock className="h-5 w-5 text-teal-600" />
+              <Clock className="h-5 w-5 text-indigo-600" />
               Active Operations Queue Controller
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 mb-6 font-semibold">
@@ -938,11 +938,11 @@ export default function Dashboard() {
                 {doctorQueue.map((t) => (
                   <div
                     key={t.id}
-                    className={`p-5 rounded-2xl border shadow-md relative overflow-hidden flex flex-col justify-between ${t.status === 'CALLING' ? 'border-teal-500 bg-teal-500/10' : 'border-slate-200 dark:border-slate-800 bg-slate-500/5'}`}
+                    className={`p-5 rounded-2xl border shadow-md relative overflow-hidden flex flex-col justify-between ${t.status === 'CALLING' ? 'border-indigo-500 bg-indigo-500/10' : 'border-slate-200 dark:border-slate-800 bg-slate-500/5'}`}
                   >
                     <div className="flex justify-between items-start">
                       <span className="text-2xl font-black text-slate-800 dark:text-slate-100">Token #{t.tokenNumber}</span>
-                      <span className={`px-2 py-0.5 rounded text-xxs font-extrabold tracking-wide uppercase ${t.status === 'CALLING' ? 'bg-teal-500 text-white' : t.status === 'COMPLETED' ? 'bg-teal-500/10 text-teal-600' : 'bg-amber-500/10 text-amber-500'}`}>
+                      <span className={`px-2 py-0.5 rounded text-xxs font-extrabold tracking-wide uppercase ${t.status === 'CALLING' ? 'bg-indigo-500 text-white' : t.status === 'COMPLETED' ? 'bg-indigo-500/10 text-indigo-600' : 'bg-amber-500/10 text-amber-500'}`}>
                         {t.status}
                       </span>
                     </div>
@@ -956,7 +956,7 @@ export default function Dashboard() {
                       {t.status === 'WAITING' && (
                         <button
                           onClick={() => handleUpdateQueueStatus(t.id, 'CALLING')}
-                          className="flex-1 py-1.5 bg-teal-600 text-white font-bold text-xxs rounded hover:bg-teal-700 transition-colors"
+                          className="flex-1 py-1.5 bg-indigo-600 text-white font-bold text-xxs rounded hover:bg-indigo-700 transition-colors"
                         >
                           Call Patient
                         </button>
@@ -965,7 +965,7 @@ export default function Dashboard() {
                         <>
                           <button
                             onClick={() => handleUpdateQueueStatus(t.id, 'COMPLETED')}
-                            className="flex-1 py-1.5 bg-teal-600 text-white font-bold text-xxos rounded hover:bg-teal-700 transition-colors"
+                            className="flex-1 py-1.5 bg-indigo-600 text-white font-bold text-xxos rounded hover:bg-indigo-700 transition-colors"
                           >
                             Consulted
                           </button>
@@ -994,7 +994,7 @@ export default function Dashboard() {
               <div className="flex justify-between items-center mb-6">
                 <div>
                   <h3 className="text-lg font-extrabold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-                    <TrendingUp className="h-5 w-5 text-teal-600" />
+                    <TrendingUp className="h-5 w-5 text-indigo-600" />
                     Doctor Revenue & Operations Report
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold mt-1">
@@ -1004,7 +1004,7 @@ export default function Dashboard() {
                 <button
                   onClick={generateSystemReport}
                   disabled={adminReportLoading}
-                  className="glow-btn px-4 py-2 bg-teal-600 text-white font-extrabold text-xs rounded-lg shadow hover:bg-teal-700 disabled:opacity-50 transition-colors"
+                  className="glow-btn px-4 py-2 bg-indigo-600 text-white font-extrabold text-xs rounded-lg shadow hover:bg-indigo-700 disabled:opacity-50 transition-colors"
                 >
                   {adminReportLoading ? 'Aggregating...' : 'Load Doctor System Audit Report'}
                 </button>
@@ -1040,7 +1040,7 @@ export default function Dashboard() {
                     </div>
                     <div className="p-4 bg-slate-500/5 border border-slate-200 dark:border-slate-800 rounded-xl">
                       <span className="text-xxs uppercase tracking-wider text-slate-400 font-bold">Total Revenue ($)</span>
-                      <h4 className="text-2xl font-black text-teal-600 dark:text-teal-400 mt-1">
+                      <h4 className="text-2xl font-black text-indigo-600 dark:text-indigo-400 mt-1">
                         ${adminReportData.data.reduce((sum, item) => sum + item.revenue, 0)}
                       </h4>
                     </div>
@@ -1063,14 +1063,14 @@ export default function Dashboard() {
                           <tr key={item.id} className="hover:bg-slate-500/5 transition-colors">
                             <td className="py-3.5 font-bold text-slate-800 dark:text-slate-200">
                               {item.name}
-                              <span className="block text-xxs text-teal-600 dark:text-teal-400 font-semibold uppercase mt-0.5">{item.specialization}</span>
+                              <span className="block text-xxs text-indigo-600 dark:text-indigo-400 font-semibold uppercase mt-0.5">{item.specialization}</span>
                             </td>
                             <td className="py-3.5 text-slate-500 dark:text-slate-400">{item.department}</td>
                             <td className="py-3.5 text-center text-slate-500 dark:text-slate-400">
                               {item.completedAppointments} Completed / {item.totalAppointments} Total
                             </td>
                             <td className="py-3.5 text-center font-bold text-slate-800 dark:text-slate-200">{item.todayQueueSize} in queue</td>
-                            <td className="py-3.5 text-right font-bold text-teal-600 dark:text-teal-400">${item.revenue}</td>
+                            <td className="py-3.5 text-right font-bold text-indigo-600 dark:text-indigo-400">${item.revenue}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -1089,7 +1089,7 @@ export default function Dashboard() {
           <div className="glass p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-md space-y-6">
             <div>
               <h3 className="text-lg font-extrabold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-                <Award className="h-5 w-5 text-teal-600" />
+                <Award className="h-5 w-5 text-indigo-600" />
                 Staff Physicians Registry Lookup
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold mt-1">
@@ -1107,13 +1107,13 @@ export default function Dashboard() {
                   value={adminSearchQuery}
                   onChange={(e) => setAdminSearchQuery(e.target.value)}
                   placeholder="Search physician by name..."
-                  className="block w-full pl-9 pr-3 py-2 border border-slate-300 dark:border-slate-700 bg-white/50 dark:bg-slate-900/50 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm"
+                  className="block w-full pl-9 pr-3 py-2 border border-slate-300 dark:border-slate-700 bg-white/50 dark:bg-slate-900/50 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
                 />
               </div>
 
               <button
                 onClick={searchPhysiciansAdmin}
-                className="glow-btn px-5 py-2 bg-slate-900 text-white dark:bg-teal-500 dark:text-slate-950 font-bold text-xs rounded-lg hover:bg-slate-800 dark:hover:bg-teal-400 transition-colors"
+                className="glow-btn px-5 py-2 bg-slate-900 text-white dark:bg-indigo-500 dark:text-slate-950 font-bold text-xs rounded-lg hover:bg-slate-800 dark:hover:bg-indigo-400 transition-colors"
               >
                 Search Physicians
               </button>
@@ -1127,7 +1127,7 @@ export default function Dashboard() {
                   className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-500/5 flex flex-col justify-between"
                 >
                   <div>
-                    <span className="inline-flex px-2 py-0.5 rounded text-xxs font-extrabold tracking-wide uppercase bg-teal-500/10 text-teal-600 dark:text-teal-400 mb-2">
+                    <span className="inline-flex px-2 py-0.5 rounded text-xxs font-extrabold tracking-wide uppercase bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 mb-2">
                       {doc.department}
                     </span>
                     <h4 className="font-extrabold text-slate-800 dark:text-slate-100">{doc.name}</h4>
@@ -1135,7 +1135,7 @@ export default function Dashboard() {
                   </div>
                   <div className="mt-6 pt-3 border-t border-slate-200 dark:border-slate-800/80 flex justify-between items-center text-xs font-semibold text-slate-500">
                     <span>Exp: {doc.experience} yrs</span>
-                    <span className="font-bold text-teal-600 dark:text-teal-400">Fee: ${doc.consultationFee}</span>
+                    <span className="font-bold text-indigo-600 dark:text-indigo-400">Fee: ${doc.consultationFee}</span>
                   </div>
                 </div>
               ))}
