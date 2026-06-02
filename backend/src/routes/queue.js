@@ -29,15 +29,34 @@ router.get('/', async (req, res) => {
   }
 });
 
+// In-memory locks map to prevent duplicate queue token allocation concurrently
+const checkInLocks = new Map();
+
+async function acquireLock(doctorId) {
+  while (checkInLocks.has(doctorId)) {
+    await checkInLocks.get(doctorId);
+  }
+  let resolveLock;
+  const promise = new Promise((resolve) => {
+    resolveLock = resolve;
+  });
+  checkInLocks.set(doctorId, promise);
+  return () => {
+    checkInLocks.delete(doctorId);
+    resolveLock();
+  };
+}
+
 // POST /api/queue/checkin
 router.post('/checkin', authenticate, async (req, res) => {
+  const { patientId, doctorId, appointmentId } = req.body;
+
+  if (!patientId || !doctorId) {
+    return res.status(400).json({ error: 'Patient and Doctor ID are required for check-in.' });
+  }
+
+  const release = await acquireLock(doctorId);
   try {
-    const { patientId, doctorId, appointmentId } = req.body;
-
-    if (!patientId || !doctorId) {
-      return res.status(400).json({ error: 'Patient and Doctor ID are required for check-in.' });
-    }
-
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -75,6 +94,8 @@ router.post('/checkin', authenticate, async (req, res) => {
   } catch (error) {
     console.error('Queue check-in error:', error);
     res.status(500).json({ error: 'Check-in failed', details: error.message });
+  } finally {
+    release();
   }
 });
 
@@ -89,3 +110,17 @@ router.patch('/:id', authenticate, async (req, res) => {
 
     const updatedToken = await prisma.queueToken.update({
       where: { id: req.params.id },
+      data: { status },
+      include: {
+        patient: true,
+        doctor: true,
+      },
+    });
+
+    res.json(updatedToken);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update queue token', details: error.message });
+  }
+});
+
+module.exports = router;
