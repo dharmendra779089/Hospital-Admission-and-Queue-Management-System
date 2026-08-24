@@ -3,15 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
-
-// Note: SQLite does not support enums. Role, AppointmentStatus, and QueueStatus
-// are stored as String fields. Valid values:
-//   Role: "ADMIN", "DOCTOR", "RECEPTIONIST"
-//   AppointmentStatus: "PENDING", "COMPLETED", "CANCELLED"
-//   QueueStatus: "WAITING", "CALLING", "COMPLETED", "SKIPPED"
 
 model User {
   id        String   @id @default(uuid())

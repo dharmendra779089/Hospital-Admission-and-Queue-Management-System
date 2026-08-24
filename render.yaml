@@ -1,6 +1,6 @@
 services:
   # ----------------------------------------------------
-  # BACKEND SERVICE (Express.js + Prisma + SQLite)
+  # BACKEND SERVICE (Express.js + Prisma + PostgreSQL)
   # ----------------------------------------------------
   - type: web
     name: haqms-backend
@@ -11,9 +11,9 @@ services:
     buildCommand: npm install && npx prisma generate
     startCommand: npx prisma db push --accept-data-loss --skip-generate && (node prisma/seed.js || true) && npm start
     envVars:
-      # Use SQLite file database
+      # PostgreSQL database connection URL
       - key: DATABASE_URL
-        value: file:./dev.db
+        value: postgresql://postgres:postgres@localhost:5432/haqms?schema=public
       # Automatically generate a secure random string for JWT signing
       - key: JWT_SECRET
         generateValue: true
