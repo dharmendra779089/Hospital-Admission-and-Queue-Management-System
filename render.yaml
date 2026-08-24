@@ -37,4 +37,4 @@ services:
     envVars:
       # Point the frontend to the backend service API
       - key: NEXT_PUBLIC_API_URL
-        value: https://haqms-backend-n072.onrender.com/api
+        value: https://haqms-backend-6zzd.onrender.com/api
