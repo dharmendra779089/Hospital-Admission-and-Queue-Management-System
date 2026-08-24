@@ -10,12 +10,12 @@ const AuthContext = createContext();
 
 // Create the top-level AuthProvider component to wrap our layouts
 export function AuthProvider({ children }) {
-  // State to store details of the currently authenticated user
-  const [user, setUser] = useState(null);
-  // State to store the active session JWT token string
-  const [token, setToken] = useState(null);
-  // State to block child renders while checking initial localStorage states
-  const [loading, setLoading] = useState(true);
+  // Unified state to store authentication details
+  const [authState, setAuthState] = useState({
+    user: null,
+    token: null,
+    loading: true,
+  });
   // State to record any authentication requests exceptions text
   const [error, setError] = useState(null);
   // Instantiate the Next.js client router controller
@@ -33,25 +33,29 @@ export function AuthProvider({ children }) {
     // If credentials exist in local storage caches
     if (savedToken && savedUser) {
       try {
-        // Cache token in React state
-        setToken(savedToken);
-        // Deserialize and cache user details in React state
-        setUser(JSON.parse(savedUser));
+        const parsedUser = JSON.parse(savedUser);
+        // Cache credentials and turn off loading atomically
+        setAuthState({
+          token: savedToken,
+          user: parsedUser,
+          loading: false,
+        });
       } catch (e) {
         // Handle localStorage corruption safely
         console.error("Failed to parse user details from localStorage", e);
         // Purge invalid credentials caches
         logout();
       }
+    } else {
+      // Turn off loading states to unblock dashboard layout components rendering
+      setAuthState((prev) => ({ ...prev, loading: false }));
     }
-    // Turn off loading states to unblock dashboard layout components rendering
-    setLoading(false);
   }, []);
 
   // Define authentication submission method handler
   const login = async (email, password) => {
     // Flag authenticating loader
-    setLoading(true);
+    setAuthState((prev) => ({ ...prev, loading: true }));
     // Purge previous validation errors
     setError(null);
     try {
@@ -74,9 +78,12 @@ export function AuthProvider({ children }) {
       localStorage.setItem("haqms_token", userToken);
       localStorage.setItem("haqms_user", JSON.stringify(userData));
       
-      // Update local context states
-      setToken(userToken);
-      setUser(userData);
+      // Update local context states atomically
+      setAuthState({
+        token: userToken,
+        user: userData,
+        loading: false,
+      });
       
       // Redirect authenticated user to Dashboard view
       router.push("/dashboard");
@@ -89,14 +96,14 @@ export function AuthProvider({ children }) {
       return { success: false, error: e.message };
     } finally {
       // Release client loading flag
-      setLoading(false);
+      setAuthState((prev) => ({ ...prev, loading: false }));
     }
   };
 
   // Define registration API submission handler
   const register = async (name, email, password, role = "RECEPTIONIST") => {
     // Flag client authentication loading indicator
-    setLoading(true);
+    setAuthState((prev) => ({ ...prev, loading: true }));
     // Purge previous state errors
     setError(null);
     try {
@@ -118,7 +125,7 @@ export function AuthProvider({ children }) {
       return { success: false, error: e.message };
     } finally {
       // Release loading flag
-      setLoading(false);
+      setAuthState((prev) => ({ ...prev, loading: false }));
     }
   };
 
@@ -128,16 +135,28 @@ export function AuthProvider({ children }) {
     localStorage.removeItem("haqms_token");
     // Delete user profile payload from browser storage
     localStorage.removeItem("haqms_user");
-    // Purge credentials context state
-    setToken(null);
-    setUser(null);
+    // Purge credentials context state atomically
+    setAuthState({
+      token: null,
+      user: null,
+      loading: false,
+    });
     // Redirect unauthenticated user back to Sign In page
     router.push("/login");
   };
 
   return (
     // Expose authentication states and handlers context-wide
-    <AuthContext.Provider value={{ user, token, loading, error, login, register, logout, API_BASE_URL }}>
+    <AuthContext.Provider value={{ 
+      user: authState.user, 
+      token: authState.token, 
+      loading: authState.loading, 
+      error, 
+      login, 
+      register, 
+      logout, 
+      API_BASE_URL 
+    }}>
       {children}
     </AuthContext.Provider>
   );

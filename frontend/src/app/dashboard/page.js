@@ -21,7 +21,7 @@ import {
 // Main Dashboard component definition
 export default function Dashboard() {
   // Destructure session state, tokens, and API routes from our custom context hook
-  const { user, token, API_BASE_URL, logout } = useAuth();
+  const { user, token, loading, API_BASE_URL, logout } = useAuth();
   // Instantiate the client router helper
   const router = useRouter();
 
@@ -101,11 +101,11 @@ export default function Dashboard() {
 
   // Session guard effect ensuring unauthenticated guests are sent to login view
   useEffect(() => {
-    // Reroute user if session is missing
-    if (!user) {
+    // Reroute user if session is missing and session state is no longer loading
+    if (!loading && !user) {
       router.push('/login');
     }
-  }, [user, router]);
+  }, [user, loading, router]);
 
   // Set default page dashboard tabs dynamically based on user role once loaded
   useEffect(() => {
@@ -131,31 +131,47 @@ export default function Dashboard() {
   // Fetch patients array on change of debounced search or gender filters
   useEffect(() => {
     // Prevent fetches if user is unauthenticated
-    if (!user) return;
+    if (!user || !token) return;
     // Restrict requests to receptionist or admin accounts
     if (user.role === 'RECEPTIONIST' || user.role === 'ADMIN') {
       fetchPatients(1);
     }
-  }, [patientSearch, patientGender]);
+  }, [user, token, patientSearch, patientGender]);
 
   // Fetch doctor dropdown datasets on initial load
   useEffect(() => {
     // Prevent fetches if user is unauthenticated
-    if (!user) return;
+    if (!user || !token) return;
     fetchDoctorsDropdown();
-  }, []);
+  }, [user, token]);
 
   // Fetch doctor active queue worklists on mount
   useEffect(() => {
     // Prevent fetches if user is unauthenticated
-    if (!user) return;
+    if (!user || !token) return;
     // Limit calls to doctors when the list is populated
     if (user.role === 'DOCTOR' && doctorsList.length > 0) {
       fetchDoctorWorklist();
     }
-  }, [doctorsList]);
+  }, [user, token, doctorsList]);
 
   // Prevent UI rendering before user context resolves
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100">
+        <div className="text-center flex flex-col items-center">
+          <div className="pulse-loader mb-4">
+            <div></div>
+            <div></div>
+          </div>
+          <p className="text-xs font-semibold text-slate-400 animate-pulse">
+            Loading session...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   if (!user) return null;
 
   // ==========================================

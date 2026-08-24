@@ -32,7 +32,7 @@ export default function PatientHistoryRecords({ params }) {
   const patientId = unwrappedParams.id;
 
   // Retrieve authorized request headers token and backend API URL endpoint from context
-  const { token, API_BASE_URL } = useAuth();
+  const { token, loading: authLoading, API_BASE_URL } = useAuth();
   // Instantiate the client router helper
   const router = useRouter();
 
@@ -47,6 +47,9 @@ export default function PatientHistoryRecords({ params }) {
 
   // Load clinical database records when patient ID or token changes
   useEffect(() => {
+    // Wait until the authentication check is completed
+    if (authLoading) return;
+
     // If the client lacks an active session token, reroute immediately to login
     if (!token) {
       router.push('/login');
@@ -81,7 +84,7 @@ export default function PatientHistoryRecords({ params }) {
 
     // Invoke asynchronous function
     fetchPatientData();
-  }, [patientId, token, API_BASE_URL, router]); // Re-run effect if dependencies change
+  }, [patientId, token, authLoading, API_BASE_URL, router]); // Re-run effect if dependencies change
 
   // Printer operation handler
   const handlePrint = () => {
@@ -136,7 +139,7 @@ export default function PatientHistoryRecords({ params }) {
         )}
 
         {/* Main state loading router switches */}
-        {loading ? (
+        {authLoading || loading ? (
           // Display pulse loader if data fetch is pending
           <div className="flex flex-col items-center justify-center py-24">
             <div className="pulse-loader">
@@ -144,7 +147,7 @@ export default function PatientHistoryRecords({ params }) {
               <div></div>
             </div>
             <p className="mt-4 text-xs font-semibold text-slate-400 animate-pulse">
-              Synchronizing clinical archive...
+              {authLoading ? 'Verifying credentials...' : 'Synchronizing clinical archive...'}
             </p>
           </div>
         ) : error ? (

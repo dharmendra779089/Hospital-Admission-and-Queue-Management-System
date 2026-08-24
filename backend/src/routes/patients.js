@@ -2,8 +2,8 @@
 const express = require('express');
 // Import PrismaClient to execute queries on our tables
 const { PrismaClient } = require('@prisma/client');
-// Import authenticate and authorizeAdminOnlyLegacy middlewares
-const { authenticate, authorizeAdminOnlyLegacy } = require('../middleware/auth');
+// Import authenticate, authorize, and authorizeAdminOnlyLegacy middlewares
+const { authenticate, authorize, authorizeAdminOnlyLegacy } = require('../middleware/auth');
 
 // Create the Express router instance
 const router = express.Router();
@@ -133,8 +133,8 @@ router.post('/', authenticate, async (req, res) => {
   }
 });
 
-// DELETE /api/patients/:id - Delete a patient record from the registry directory (Admin Only)
-router.delete('/:id', authenticate, authorizeAdminOnlyLegacy, async (req, res) => {
+// DELETE /api/patients/:id - Delete a patient record from the registry directory (Admin & Receptionist)
+router.delete('/:id', authenticate, authorize(['ADMIN', 'RECEPTIONIST']), async (req, res) => {
   // Try block to intercept deletion transactions failures safely
   try {
     // Extract the ID value from path dynamic parameters
@@ -148,14 +148,20 @@ router.delete('/:id', authenticate, authorizeAdminOnlyLegacy, async (req, res) =
       return res.status(404).json({ error: 'Patient not found' });
     }
 
-    // Execute the delete operation in the database
-    await prisma.patient.delete({ where: { id } });
+    // Execute the delete operation in the database, cascade-deleting related queue tokens and appointments first
+    await prisma.$transaction([
+      prisma.queueToken.deleteMany({ where: { patientId: id } }),
+      prisma.appointment.deleteMany({ where: { patientId: id } }),
+      prisma.patient.delete({ where: { id } }),
+    ]);
+
     // Respond with a success message confirming deletion
     res.json({ message: `Successfully deleted patient ${patient.name}` });
   // Intercept foreign key constraint violations or query execution issues
   } catch (error) {
+    console.error('Failed to delete patient:', error);
     // Return a 500 status indicating deletion execution failure
-    res.status(500).json({ error: 'Failed to delete patient' });
+    res.status(500).json({ error: 'Failed to delete patient: ' + error.message });
   }
 });
 

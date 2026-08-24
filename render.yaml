@@ -1,0 +1,40 @@
+services:
+  # ----------------------------------------------------
+  # BACKEND SERVICE (Express.js + Prisma + SQLite)
+  # ----------------------------------------------------
+  - type: web
+    name: haqms-backend
+    env: node
+    plan: free
+    rootDir: backend
+    # Install dependencies, generate Prisma client, apply migrations, and seed the database
+    buildCommand: npm install && npx prisma generate && npx prisma migrate deploy && node prisma/seed.js
+    startCommand: npm start
+    envVars:
+      # Use SQLite file database
+      - key: DATABASE_URL
+        value: file:./dev.db
+      # Automatically generate a secure random string for JWT signing
+      - key: JWT_SECRET
+        generateValue: true
+      # Allow CORS requests from the frontend service
+      - key: FRONTEND_URL
+        value: https://haqms-frontend.onrender.com
+      - key: NODE_ENV
+        value: production
+
+  # ----------------------------------------------------
+  # FRONTEND SERVICE (Next.js)
+  # ----------------------------------------------------
+  - type: web
+    name: haqms-frontend
+    env: node
+    plan: free
+    rootDir: frontend
+    # Install dependencies and build the Next.js production bundle
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      # Point the frontend to the backend service API
+      - key: NEXT_PUBLIC_API_URL
+        value: https://haqms-backend.onrender.com/api

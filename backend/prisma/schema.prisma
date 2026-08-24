@@ -3,35 +3,22 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  ADMIN
-  DOCTOR
-  RECEPTIONIST
-}
-
-enum AppointmentStatus {
-  PENDING
-  COMPLETED
-  CANCELLED
-}
-
-enum QueueStatus {
-  WAITING
-  CALLING
-  COMPLETED
-  SKIPPED
-}
+// Note: SQLite does not support enums. Role, AppointmentStatus, and QueueStatus
+// are stored as String fields. Valid values:
+//   Role: "ADMIN", "DOCTOR", "RECEPTIONIST"
+//   AppointmentStatus: "PENDING", "COMPLETED", "CANCELLED"
+//   QueueStatus: "WAITING", "CALLING", "COMPLETED", "SKIPPED"
 
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
   password  String
   name      String
-  role      Role     @default(RECEPTIONIST)
+  role      String   @default("RECEPTIONIST")
   createdAt DateTime @default(now())
 
   doctor Doctor?
@@ -75,15 +62,15 @@ model Patient {
 }
 
 model Appointment {
-  id              String            @id @default(uuid())
+  id              String   @id @default(uuid())
   patientId       String
-  patient         Patient           @relation(fields: [patientId], references: [id])
+  patient         Patient  @relation(fields: [patientId], references: [id])
   doctorId        String
-  doctor          Doctor            @relation(fields: [doctorId], references: [id])
+  doctor          Doctor   @relation(fields: [doctorId], references: [id])
   appointmentDate DateTime
-  reason          String            @default("")
-  status          AppointmentStatus @default(PENDING)
-  createdAt       DateTime          @default(now())
+  reason          String   @default("")
+  status          String   @default("PENDING")
+  createdAt       DateTime @default(now())
 
   queueTokens QueueToken[]
 
@@ -93,16 +80,16 @@ model Appointment {
 }
 
 model QueueToken {
-  id            String      @id @default(uuid())
+  id            String       @id @default(uuid())
   tokenNumber   Int
   patientId     String
-  patient       Patient     @relation(fields: [patientId], references: [id])
+  patient       Patient      @relation(fields: [patientId], references: [id])
   doctorId      String
-  doctor        Doctor      @relation(fields: [doctorId], references: [id])
+  doctor        Doctor       @relation(fields: [doctorId], references: [id])
   appointmentId String?
   appointment   Appointment? @relation(fields: [appointmentId], references: [id])
-  status        QueueStatus @default(WAITING)
-  createdAt     DateTime    @default(now())
+  status        String       @default("WAITING")
+  createdAt     DateTime     @default(now())
 
   @@index([doctorId, createdAt])
   @@index([status])
