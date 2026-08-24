@@ -9,11 +9,13 @@ services:
     rootDir: backend
     # Install dependencies, generate Prisma client, apply migrations, and seed the database
     buildCommand: npm install && npx prisma generate
-    startCommand: npx prisma db push --accept-data-loss --skip-generate && (node prisma/seed.js || true) && npm start
+    startCommand: (npx prisma db push --accept-data-loss --skip-generate || true) && (node prisma/seed.js || true) && npm start
     envVars:
-      # PostgreSQL database connection URL
+      # PostgreSQL database connection URL (linked to Render PostgreSQL instance)
       - key: DATABASE_URL
-        value: postgresql://postgres:postgres@localhost:5432/haqms?schema=public
+        fromDatabase:
+          name: haqms-db
+          property: connectionString
       # Automatically generate a secure random string for JWT signing
       - key: JWT_SECRET
         generateValue: true
@@ -38,3 +40,13 @@ services:
       # Point the frontend to the backend service API
       - key: NEXT_PUBLIC_API_URL
         value: https://haqms-backend-6zzd.onrender.com/api
+
+# ----------------------------------------------------
+# DATABASE SERVICE (Render Managed PostgreSQL)
+# ----------------------------------------------------
+databases:
+  - name: haqms-db
+    plan: free
+    databaseName: haqms
+    user: postgres
+
