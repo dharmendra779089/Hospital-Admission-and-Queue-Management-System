@@ -121,7 +121,7 @@ router.post('/login', async (req, res) => {
     // Log the error to stdout for debugging audits
     console.error('Login error:', error);
     // Return a clean 500 Internal Server Error without leaking internal server logs
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: error.message });
   }
 });
 

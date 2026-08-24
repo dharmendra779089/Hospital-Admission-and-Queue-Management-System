@@ -21,7 +21,7 @@ services:
       - key: FRONTEND_URL
         value: https://haqms-frontend-qk7k.onrender.com
       - key: NODE_ENV
-        value: production
+        value: development
 
   # ----------------------------------------------------
   # FRONTEND SERVICE (Next.js)
