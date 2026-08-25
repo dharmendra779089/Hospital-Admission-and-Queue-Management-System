@@ -9,8 +9,9 @@ Candidates are tasked with auditing the codebase to identify, debug, profile, se
 ## 🛠️ Tech Stack
 - **Frontend**: Next.js (App Router, Tailwind CSS, Lucide icons, Context API)
 - **Backend**: Node.js + Express
-- **Database & ORM**: PostgreSQL + Prisma ORM
-- **Process Management**: Docker Compose (Optional local PostgreSQL helper)
+- **Database & ORM**: PostgreSQL + Prisma ORM (`provider = "postgresql"`)
+- **Process Management**: Docker Compose (Local PostgreSQL helper)
+- **Cloud Infrastructure**: Render (`render.yaml` Blueprint with Render Managed PostgreSQL)
 
 ---
 
@@ -30,9 +31,9 @@ You need a running PostgreSQL server. If you have Docker installed, you can spin
 ```bash
 docker-compose up -d
 ```
-Alternatively, configure your local PostgreSQL server and update the connection URL in `backend/.env`:
+Alternatively, configure your local PostgreSQL server and ensure the connection URL is set in `backend/.env`:
 ```env
-DATABASE_URL="postgresql://<user>:<password>@localhost:5432/haqms?schema=public"
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/haqms?schema=public"
 ```
 
 ### 3. Deploy Schema & Seed Mock Data
@@ -46,6 +47,20 @@ Launch both the Next.js development client (port `3000`) and the Express API ser
 ```bash
 npm run dev
 ```
+
+---
+
+## ☁️ Cloud Deployment (Render)
+
+The project includes a pre-configured Render Blueprint (`render.yaml`):
+
+1. **Managed PostgreSQL**: Automatically provisions a Render Managed PostgreSQL database (`haqms-db`).
+2. **Backend Service (`haqms-backend`)**: Connects to `haqms-db` via environment variable injection (`DATABASE_URL`), applies Prisma database migrations, seeds mock data, and starts the Express API server.
+3. **Frontend Service (`haqms-frontend`)**: Builds and serves the Next.js production client.
+
+To deploy on Render:
+- Connect your GitHub repository to Render.
+- Deploy using the root `render.yaml` Blueprint.
 
 ---
 

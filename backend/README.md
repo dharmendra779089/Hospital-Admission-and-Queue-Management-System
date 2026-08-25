@@ -6,8 +6,9 @@ This is the Express API server and database layer for the Hospital Appointment &
 The backend server runs on port `5000` by default.
 
 ### Setup Database Environment
-1. Ensure a local PostgreSQL instance is running or launch the pre-packaged docker container.
-2. Build migrations and run the mock seed:
+1. Ensure a local PostgreSQL instance is running or launch the pre-packaged docker container: `docker-compose up -d`.
+2. Configure `DATABASE_URL` in `backend/.env`: `postgresql://postgres:postgres@localhost:5432/haqms?schema=public`.
+3. Apply PostgreSQL migrations and seed mock data:
 ```bash
 npm run db:setup
 ```
