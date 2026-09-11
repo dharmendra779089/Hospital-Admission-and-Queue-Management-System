@@ -1,7 +1,7 @@
 'use client';
 
 // Import essential React context hooks and state hooks
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 // Import dynamic router hook from Next.js for client redirects
 import { useRouter } from 'next/navigation';
 
@@ -24,33 +24,51 @@ export function AuthProvider({ children }) {
   // Configure the API base endpoint dynamically from environment variables
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
-  // Check for existing cached credentials on layout mounts
+  // Define credentials logout cleanup helper with useCallback
+  const logout = useCallback(() => {
+    // Delete token from browser storage
+    localStorage.removeItem("haqms_token");
+    // Delete user profile payload from browser storage
+    localStorage.removeItem("haqms_user");
+    // Purge credentials context state atomically
+    setAuthState({
+      token: null,
+      user: null,
+      loading: false,
+    });
+    // Redirect unauthenticated user back to Sign In page
+    router.push("/login");
+  }, [router]);
+
+  // Check for existing cached credentials on layout mounts asynchronously to prevent cascading renders
   useEffect(() => {
-    // Attempt to load the token from localStorage
-    const savedToken = localStorage.getItem("haqms_token");
-    // Attempt to load the user payload from localStorage
-    const savedUser = localStorage.getItem("haqms_user");
-    // If credentials exist in local storage caches
-    if (savedToken && savedUser) {
-      try {
-        const parsedUser = JSON.parse(savedUser);
-        // Cache credentials and turn off loading atomically
-        setAuthState({
-          token: savedToken,
-          user: parsedUser,
-          loading: false,
-        });
-      } catch (e) {
-        // Handle localStorage corruption safely
-        console.error("Failed to parse user details from localStorage", e);
-        // Purge invalid credentials caches
-        logout();
+    let isMounted = true;
+    Promise.resolve().then(() => {
+      if (!isMounted) return;
+      const savedToken = localStorage.getItem("haqms_token");
+      const savedUser = localStorage.getItem("haqms_user");
+      if (savedToken && savedUser) {
+        try {
+          const parsedUser = JSON.parse(savedUser);
+          setAuthState({
+            token: savedToken,
+            user: parsedUser,
+            loading: false,
+          });
+          return;
+        } catch (e) {
+          console.error("Failed to parse user details from localStorage", e);
+          logout();
+          return;
+        }
       }
-    } else {
-      // Turn off loading states to unblock dashboard layout components rendering
-      setAuthState((prev) => ({ ...prev, loading: false }));
-    }
-  }, []);
+      setAuthState((prev) => (prev.loading ? { ...prev, loading: false } : prev));
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [logout]);
 
   // Define authentication submission method handler
   const login = async (email, password) => {
@@ -129,22 +147,6 @@ export function AuthProvider({ children }) {
     }
   };
 
-  // Define credentials logout cleanup helper
-  const logout = () => {
-    // Delete token from browser storage
-    localStorage.removeItem("haqms_token");
-    // Delete user profile payload from browser storage
-    localStorage.removeItem("haqms_user");
-    // Purge credentials context state atomically
-    setAuthState({
-      token: null,
-      user: null,
-      loading: false,
-    });
-    // Redirect unauthenticated user back to Sign In page
-    router.push("/login");
-  };
-
   return (
     // Expose authentication states and handlers context-wide
     <AuthContext.Provider value={{ 
@@ -164,8 +166,5 @@ export function AuthProvider({ children }) {
 
 // Expose custom hook for simple context consumption in child components
 export function useAuth() {
-  const context = useContext(AuthContext);
-  // Throw exception if developer attempts to consume hook outside provider tree
-  if (!context) throw new Error("useAuth must be used within an AuthProvider");
-  return context;
+  return useContext(AuthContext);
 }

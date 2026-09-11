@@ -31,29 +31,29 @@ export default function Login() {
     // Clear any previous validation errors from the UI state
     setValidationError('');
 
-    // INCONSISTENT VALIDATION BUG:
-    // Simple basic regex that is flawed (e.g. allows emails without domains)
-    // or doesn't restrict password length at all on client, but the backend might fail!
-    // Regular expression pattern for basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+$/;
     // Check if the email field is empty
     if (!email) {
-      // Set local validation warning message
       setValidationError('Please enter your email address.');
-      // Stop execution
       return;
     }
     
-    // Check if the entered email matches the regular expression pattern
+    // Regular expression pattern for email validation with domain
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      // Set local validation warning message
-      setValidationError('Please enter a valid email format.');
-      // Stop execution
+      setValidationError('Please enter a valid email address with domain.');
       return;
     }
 
-    // Notice we do NOT check password length here (even though registration requires it),
-    // causing inconsistent user experiences and letting brute force slide.
+    // Validate password presence and minimum length
+    if (!password) {
+      setValidationError('Please enter your password.');
+      return;
+    }
+
+    if (password.length < 6) {
+      setValidationError('Password must be at least 6 characters.');
+      return;
+    }
     
     // Execute login action within the authentication context
     const result = await login(email, password);

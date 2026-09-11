@@ -30,7 +30,10 @@ export default function Dashboard() {
   // ==========================================
 
   // State hook to track the active tab category layout
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [selectedTab, setSelectedTab] = useState(null);
+  const defaultTab = user?.role === 'ADMIN' ? 'reports' : user?.role === 'DOCTOR' ? 'appointments' : 'patients';
+  const activeTab = selectedTab || defaultTab;
+  const setActiveTab = setSelectedTab;
 
   // State hook for storing raw search input characters
   const [patientSearchInput, setPatientSearchInput] = useState('');
@@ -95,65 +98,131 @@ export default function Dashboard() {
   // State storing search string input for administrative physician searches
   const [adminSearchQuery, setAdminSearchQuery] = useState('');
 
+  // Controlled states for walk-in direct check-in operations
+  const [walkinPatientId, setWalkinPatientId] = useState('');
+  const [walkinDoctorId, setWalkinDoctorId] = useState('');
+
+  // ==========================================
+  // DATA FETCHING CALLBACKS
+  // ==========================================
+
+  // Fetch paginated patient records from the backend matching search query and gender filters
+  const fetchPatients = useCallback(async (page = 1) => {
+    setPatientsLoading(true);
+    try {
+      const res = await fetch(
+        `${API_BASE_URL}/patients?page=${page}&limit=5&search=${encodeURIComponent(patientSearch)}&gender=${encodeURIComponent(patientGender)}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const data = await res.json();
+      if (data.success) {
+        setPatients(data.patients);
+        setPatientsPagination({
+          page: data.pagination.page,
+          totalPages: data.pagination.totalPages,
+          totalPatients: data.pagination.totalPatients,
+        });
+      }
+    } catch (e) {
+      console.error('Failed to fetch patients:', e);
+    } finally {
+      setPatientsLoading(false);
+    }
+  }, [API_BASE_URL, token, patientSearch, patientGender]);
+
+  // Fetch all registered physicians for scheduling dropdown options
+  const fetchDoctorsDropdown = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/doctors`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        setDoctorsList(data);
+      }
+    } catch (e) {
+      console.error('Failed to fetch doctors list:', e);
+    }
+  }, [API_BASE_URL, token]);
+
+  // Pull doctor-specific appointments and queue tokens in parallel
+  const fetchDoctorWorklist = useCallback(async () => {
+    if (user?.role !== 'DOCTOR') return;
+    try {
+      const matchedDoc = doctorsList.find((d) => d.userId === user.id);
+      if (!matchedDoc) return;
+
+      const [appRes, queueRes] = await Promise.all([
+        fetch(`${API_BASE_URL}/appointments?doctorId=${matchedDoc.id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+        fetch(`${API_BASE_URL}/queue?doctorId=${matchedDoc.id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+      ]);
+
+      const appData = await appRes.json();
+      if (appData.success) setDoctorAppointments(appData.appointments);
+
+      const queueData = await queueRes.json();
+      if (Array.isArray(queueData)) setDoctorQueue(queueData);
+    } catch (e) {
+      console.error('Failed to fetch doctor worklist:', e);
+    }
+  }, [API_BASE_URL, token, user, doctorsList]);
+
   // ==========================================
   // EFFECTS — also before early return
   // ==========================================
 
   // Session guard effect ensuring unauthenticated guests are sent to login view
   useEffect(() => {
-    // Reroute user if session is missing and session state is no longer loading
     if (!loading && !user) {
       router.push('/login');
     }
   }, [user, loading, router]);
 
-  // Set default page dashboard tabs dynamically based on user role once loaded
-  useEffect(() => {
-    // Stop execution if user model is not loaded yet
-    if (!user) return;
-    // Map initial tab based on role properties
-    if (user.role === 'ADMIN') setActiveTab('reports');
-    else if (user.role === 'RECEPTIONIST') setActiveTab('patients');
-    else setActiveTab('appointments');
-  }, [user?.role]);
-
   // Debounce search effect to limit database fetch requests during user keystrokes
   useEffect(() => {
-    // Instantiate 400ms delay timer
     const timer = setTimeout(() => {
-      // Update debounced search state
       setPatientSearch(patientSearchInput);
     }, 400);
-    // Return cleanup hook clearing active timers on keystroke changes
     return () => clearTimeout(timer);
   }, [patientSearchInput]);
 
   // Fetch patients array on change of debounced search or gender filters
   useEffect(() => {
-    // Prevent fetches if user is unauthenticated
     if (!user || !token) return;
-    // Restrict requests to receptionist or admin accounts
     if (user.role === 'RECEPTIONIST' || user.role === 'ADMIN') {
-      fetchPatients(1);
+      let isSubscribed = true;
+      Promise.resolve().then(() => {
+        if (isSubscribed) fetchPatients(1);
+      });
+      return () => { isSubscribed = false; };
     }
-  }, [user, token, patientSearch, patientGender]);
+  }, [user, token, fetchPatients]);
 
   // Fetch doctor dropdown datasets on initial load
   useEffect(() => {
-    // Prevent fetches if user is unauthenticated
     if (!user || !token) return;
-    fetchDoctorsDropdown();
-  }, [user, token]);
+    let isSubscribed = true;
+    Promise.resolve().then(() => {
+      if (isSubscribed) fetchDoctorsDropdown();
+    });
+    return () => { isSubscribed = false; };
+  }, [user, token, fetchDoctorsDropdown]);
 
   // Fetch doctor active queue worklists on mount
   useEffect(() => {
-    // Prevent fetches if user is unauthenticated
     if (!user || !token) return;
-    // Limit calls to doctors when the list is populated
     if (user.role === 'DOCTOR' && doctorsList.length > 0) {
-      fetchDoctorWorklist();
+      let isSubscribed = true;
+      Promise.resolve().then(() => {
+        if (isSubscribed) fetchDoctorWorklist();
+      });
+      return () => { isSubscribed = false; };
     }
-  }, [user, token, doctorsList]);
+  }, [user, token, doctorsList, fetchDoctorWorklist]);
 
   // Prevent UI rendering before user context resolves
   if (loading) {
@@ -177,56 +246,6 @@ export default function Dashboard() {
   // ==========================================
   // RECEPTIONIST FUNCTIONS
   // ==========================================
-
-  // Fetch paginated patient records from the backend matching search query and gender filters
-  const fetchPatients = async (page = 1) => {
-    // Enable patient loading spinner
-    setPatientsLoading(true);
-    try {
-      // Execute GET request with query params for pagination, search queries, and gender filters
-      const res = await fetch(
-        `${API_BASE_URL}/patients?page=${page}&limit=5&search=${patientSearch}&gender=${patientGender}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      // Decode JSON response
-      const data = await res.json();
-      // If response resolves successfully, map variables to react states
-      if (data.success) {
-        // Cache patient list
-        setPatients(data.patients);
-        // Record pagination metrics
-        setPatientsPagination({
-          page: data.pagination.page,
-          totalPages: data.pagination.totalPages,
-          totalPatients: data.pagination.totalPatients,
-        });
-      }
-    } catch (e) {
-      // Log connection failures
-      console.error(e);
-    } finally {
-      // Disable patient loading spinner
-      setPatientsLoading(false);
-    }
-  };
-
-  // Fetch all registered physicians for scheduling dropdown options
-  const fetchDoctorsDropdown = async () => {
-    try {
-      // Send GET request to doctors endpoint
-      const res = await fetch(`${API_BASE_URL}/doctors`, {
-        // Pass bearer security credentials
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      // Parse physician array
-      const data = await res.json();
-      // Cache physician entries in local state
-      setDoctorsList(data);
-    } catch (e) {
-      // Log errors
-      console.error(e);
-    }
-  };
 
   // Register new patient records within the repository
   const handleRegisterPatient = async (e) => {
@@ -398,43 +417,6 @@ export default function Dashboard() {
   // ==========================================
   // DOCTOR WORKFLOW FUNCTIONS
   // ==========================================
-
-  // Pull doctor-specific appointments and queue tokens in parallel
-  const fetchDoctorWorklist = async () => {
-    // Terminate check-in query operations if user is not a practitioner
-    if (user.role !== 'DOCTOR') return;
-    try {
-      // Find matching physician primary key mapping user credentials ID
-      const matchedDoc = doctorsList.find((d) => d.userId === user.id);
-      // Stop execution if physician ID lookup returns empty
-      if (!matchedDoc) return;
-
-      // Run multiple async fetch operations in parallel via Promise.all
-      const [appRes, queueRes] = await Promise.all([
-        // Pull doctor appointments
-        fetch(`${API_BASE_URL}/appointments?doctorId=${matchedDoc.id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-        // Pull doctor queues
-        fetch(`${API_BASE_URL}/queue?doctorId=${matchedDoc.id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-      ]);
-
-      // Decode appointment query arrays
-      const appData = await appRes.json();
-      // Cache results in state
-      if (appData.success) setDoctorAppointments(appData.appointments);
-
-      // Decode queue lists
-      const queueData = await queueRes.json();
-      // Cache active queues in state
-      setDoctorQueue(queueData);
-    } catch (e) {
-      // Log errors
-      console.error(e);
-    }
-  };
 
   // Update status indicators on active queue tokens
   const handleUpdateQueueStatus = async (tokenId, newStatus) => {
@@ -687,10 +669,14 @@ export default function Dashboard() {
                               </td>
                               {/* Column 4: Check-in / Delete Actions */}
                               <td className="py-3.5 text-right space-x-2">
-                                {/* Direct checkin triggers active tokens generation */}
+                                {/* Direct checkin triggers walk-in check-in with pre-selected patient */}
                                 <button
-                                  onClick={() => handleQueueCheckin(p.id, doctorsList[0]?.id)}
+                                  onClick={() => {
+                                    setWalkinPatientId(p.id);
+                                    setActiveTab('walkin');
+                                  }}
                                   className="text-xxs px-2.5 py-1 rounded bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold hover:bg-indigo-500 hover:text-white transition-colors"
+                                  title="Check in patient for walk-in consultation"
                                 >
                                   Check In
                                 </button>
@@ -957,7 +943,8 @@ export default function Dashboard() {
                   <div>
                     <label className="block mb-1">Select Walk-in Patient*</label>
                     <select
-                      id="walkin-patient"
+                      value={walkinPatientId}
+                      onChange={(e) => setWalkinPatientId(e.target.value)}
                       className="block w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-white/50 dark:bg-slate-900/50 rounded-lg text-slate-900 dark:text-slate-100 text-sm focus:outline-none"
                     >
                       <option value="">-- Choose Patient --</option>
@@ -971,7 +958,8 @@ export default function Dashboard() {
                   <div>
                     <label className="block mb-1">Assign Physician*</label>
                     <select
-                      id="walkin-doctor"
+                      value={walkinDoctorId}
+                      onChange={(e) => setWalkinDoctorId(e.target.value)}
                       className="block w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-white/50 dark:bg-slate-900/50 rounded-lg text-slate-900 dark:text-slate-100 text-sm focus:outline-none"
                     >
                       <option value="">-- Choose Physician --</option>
@@ -984,13 +972,13 @@ export default function Dashboard() {
                   {/* Call-to-action button to check patient directly into the live calling queues */}
                   <button
                     onClick={() => {
-                      const pId = document.getElementById('walkin-patient').value;
-                      const dId = document.getElementById('walkin-doctor').value;
-                      if (!pId || !dId) {
-                        alert('Select patient and doctor first');
+                      if (!walkinPatientId || !walkinDoctorId) {
+                        setCheckinMessage('Please select both a patient and physician first.');
                         return;
                       }
-                      handleQueueCheckin(pId, dId);
+                      handleQueueCheckin(walkinPatientId, walkinDoctorId);
+                      setWalkinPatientId('');
+                      setWalkinDoctorId('');
                     }}
                     className="glow-btn w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white dark:bg-indigo-500 dark:text-slate-950 dark:hover:bg-indigo-400 font-extrabold text-sm rounded-lg shadow-md transition-colors duration-300 mt-2"
                   >

@@ -1,22 +1,20 @@
 // Import Express to define reports router endpoints
 const express = require('express');
-// Import PrismaClient to interact with the database
-const { PrismaClient } = require('@prisma/client');
-// Import authenticate middleware to secure reports queries
-const { authenticate } = require('../middleware/auth');
+// Import shared PrismaClient singleton instance
+const prisma = require('../prisma');
+// Import authenticate and authorize middlewares to secure reports queries
+const { authenticate, authorize } = require('../middleware/auth');
 
 // Create the Express router instance
 const router = express.Router();
-// Create the Prisma database client
-const prisma = new PrismaClient();
 
 // GET /api/reports/doctor-stats - Generate high-level doctor revenue and work stats report (Admin Only)
-router.get('/doctor-stats', authenticate, async (req, res) => {
+router.get('/doctor-stats', authenticate, authorize(['ADMIN']), async (req, res) => {
   // Try block to intercept database aggregation failures safely
   try {
-    // Construct Date instance matching midnight today
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    // Construct Date instance matching midnight today in UTC
+    const now = new Date();
+    const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0, 0));
 
     // Run 3 aggregation queries concurrently to avoid blocking event loops
     const [doctors, appointmentStats, queueStats] = await Promise.all([

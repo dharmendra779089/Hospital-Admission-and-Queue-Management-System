@@ -22,8 +22,8 @@ const authenticate = (req, res, next) => {
   const token = authHeader.split(' ')[1];
   // Wrap token signature verification inside a try block to handle expiry/corruption
   try {
-    // Validate the token string against our secret key, returning the decoded payload
-    const decoded = jwt.verify(token, JWT_SECRET);
+    // Validate the token string against our secret key, explicitly enforcing HS256 algorithm
+    const decoded = jwt.verify(token, JWT_SECRET, { algorithms: ['HS256'] });
     // Attach the user metadata payload directly to the request object for downstream routes
     req.user = decoded;
     // Pass control to the next middleware or route handler in the chain

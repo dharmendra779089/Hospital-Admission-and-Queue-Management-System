@@ -1,8 +1,8 @@
 // Enable client-side rendering mode for the public monitor in Next.js App Router
 'use client';
 
-// Import essential React hooks for state, side-effects, and memoized callbacks
-import { useState, useEffect, useCallback } from 'react';
+// Import essential React hooks for state and side-effects
+import { useState, useEffect } from 'react';
 // Import the shared navigation bar component
 import Navbar from '@/components/common/Navbar';
 // Import necessary Lucide icons for styling headers and notifications
@@ -22,54 +22,52 @@ export default function QueueMonitor() {
   // Retrieve the public backend URL from environment variables, fallback to local dev server
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
-  // Memoized fetch function to request queue data from the backend
-  const fetchQueueData = useCallback(async () => {
-    try {
-      // Execute GET request to queue endpoint
-      const res = await fetch(`${API_BASE_URL}/queue`);
-      // If response status is not 200, throw an error
-      if (!res.ok) throw new Error('Failed to retrieve active token queue.');
-      // Parse the JSON array of tokens
-      const data = await res.json();
-      // Store the active token list in state
-      setTokens(data);
-      // Clear any previous error states
-      setError('');
-    } catch (err) {
-      // Print detailed error telemetry to standard console
-      console.error('Queue poll fetch error:', err);
-      // Update local error status to display message on screen
-      setError(err.message);
-    } finally {
-      // Deactivate spinner loading state
-      setLoading(false);
-    }
-  }, [API_BASE_URL]); // Recalculate callback only if API base URL changes
-
-  // Set up side effect to poll queue endpoint periodically
+  // Set up polling side effect with proper lifecycle cleanup and cancellation guard
   useEffect(() => {
-    // Perform initial data fetch immediately on component mount
+    let isMounted = true;
+
+    const fetchQueueData = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/queue`);
+        if (!res.ok) throw new Error('Failed to retrieve active token queue.');
+        const data = await res.json();
+        if (isMounted) {
+          setTokens(Array.isArray(data) ? data : []);
+          setError('');
+          setLoading(false);
+        }
+      } catch (err) {
+        if (isMounted) {
+          console.error('Queue poll fetch error:', err);
+          setError(err.message || 'Unable to connect to live queue service');
+          setLoading(false);
+        }
+      }
+    };
+
     fetchQueueData();
-    // Instantiate interval timer to fetch queue data every 3 seconds
+
+    // Poll every 3 seconds
     const intervalId = setInterval(() => {
-      // Re-fetch queue data
       fetchQueueData();
-      // Increment poll count for debugging visual aids
-      setRefreshCount((prev) => prev + 1);
+      if (isMounted) {
+        setRefreshCount((prev) => prev + 1);
+      }
     }, 3000);
-    // Return cleanup hook to stop polling interval when page unmounts
-    return () => clearInterval(intervalId);
-  }, [fetchQueueData]); // Re-register polling logic if fetch callback changes
+
+    return () => {
+      isMounted = false;
+      clearInterval(intervalId);
+    };
+  }, [API_BASE_URL]);
 
   // Transform flat list of active tokens into grouped segments structured by doctor
   const groupedTokens = tokens.reduce((groups, token) => {
-    // Extract the primary key identifying the doctor assigned to this token
     const docId = token.doctorId;
-    // Initialize empty doctor group container if not yet encountered in loop
     if (!groups[docId]) {
       groups[docId] = {
-        doctorName: token.doctor.name,
-        specialization: token.doctor.specialization,
+        doctorName: token.doctor?.name || 'Practitioner',
+        specialization: token.doctor?.specialization || 'General Practice',
         calling: null, // Stores the token currently in consultation
         waiting: [],   // Stores upcoming tokens waiting in queue
       };
@@ -80,13 +78,12 @@ export default function QueueMonitor() {
     } else if (token.status === 'WAITING') {
       groups[docId].waiting.push(token);
     }
-    // Return accumulative dictionary object
     return groups;
   }, {});
 
   return (
     // Main full height page container
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100">
       {/* Render persistent top navigation bar */}
       <Navbar />
       {/* Content wrapper centered with max-width limits */}
@@ -101,42 +98,41 @@ export default function QueueMonitor() {
               <Monitor className="h-6 w-6" />
             </div>
             <div>
-              <h1 className="text-2xl font-extrabold text-slate-800 dark:text-slate-100">Live Public Monitor Board</h1>
-              <p className="text-xs text-slate-400 font-semibold mt-1">Real-time physician calling boards. Auto-syncs every 3 seconds.</p>
+              <h1 className="text-2xl sm:text-3xl font-black text-slate-800 dark:text-slate-100">Live Hospital Calling Monitor</h1>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold mt-1">Real-time public token monitor. Updates automatically.</p>
             </div>
           </div>
-          {/* Polling telemetry badges */}
+
+          {/* Sync indicator pill */}
           <div className="flex items-center gap-3">
-            {/* Spinning activity status badge */}
-            <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 text-xs font-bold uppercase tracking-wide border border-indigo-500/20">
-              <RefreshCw className="h-3.5 w-3.5 animate-spin" />
-              Auto Refreshing
+            <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xxs font-extrabold uppercase tracking-wide bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+              Live Feed Connected
             </span>
-            {/* Monospace poll refresh counter display */}
-            <div className="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-400 text-xs font-mono">
-              Polls: {refreshCount}
-            </div>
+            <span className="text-xxs font-mono text-slate-400 font-semibold hidden sm:inline">
+              Polls: #{refreshCount}
+            </span>
           </div>
         </div>
 
-        {/* Dynamic warning bar rendered if API server connection fails */}
+        {/* Error message alert card */}
         {error && (
-          <div className="p-4 mb-6 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-500 flex items-center gap-3 text-sm">
-            {/* Error badge */}
-            <AlertCircle className="h-5 w-5 shrink-0" />
-            <div><strong>Sync Error:</strong> {error} - Please verify that the backend API server is online.</div>
+          <div className="mb-6 p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-500 text-xs font-bold flex items-center gap-2">
+            <AlertCircle className="h-4 w-4 flex-shrink-0" />
+            <span>{error}</span>
           </div>
         )}
 
-        {/* Core conditional block checking loaded status */}
+        {/* Dynamic rendering branches based on data state */}
         {loading && tokens.length === 0 ? (
-          // Spinner display when database query has not resolved yet
-          <div className="flex flex-col items-center justify-center py-20">
-            <p className="text-sm font-semibold text-slate-400">Loading active token queues...</p>
+          // Initial load spinner
+          <div className="flex flex-col items-center justify-center py-24">
+            <RefreshCw className="h-8 w-8 text-indigo-500 animate-spin" />
+            <p className="mt-4 text-xs font-bold text-slate-400">Connecting to queue dispatch stream...</p>
           </div>
         ) : Object.keys(groupedTokens).length === 0 ? (
-          // Placeholder panel rendered if no tokens exist today
-          <div className="glass p-12 text-center rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
+          // Empty queue display card
+          <div className="glass p-12 text-center rounded-2xl border border-slate-200 dark:border-slate-800">
             <Bell className="h-12 w-12 text-slate-400 mx-auto animate-bounce" />
             <h3 className="mt-4 text-lg font-bold text-slate-800 dark:text-slate-100">No Active Tokens</h3>
             <p className="mt-2 text-slate-500 text-sm max-w-md mx-auto">No patient check-ins registered for today.</p>
@@ -163,8 +159,10 @@ export default function QueueMonitor() {
                       <div className="bg-indigo-500/10 border border-indigo-500/30 p-6 rounded-2xl text-center">
                         {/* Token Number */}
                         <span className="block text-5xl font-black text-indigo-600 dark:text-indigo-400 tracking-wider animate-pulse">#{docInfo.calling.tokenNumber}</span>
-                        {/* Patient Name */}
-                        <span className="block text-xs font-bold text-slate-400 uppercase tracking-wide mt-2">Patient: {docInfo.calling.patient.name}</span>
+                        {/* Patient Name with safe optional chaining */}
+                        <span className="block text-xs font-bold text-slate-400 uppercase tracking-wide mt-2">
+                          Patient: {docInfo.calling.patient?.name || 'Unknown Patient'}
+                        </span>
                       </div>
                     ) : (
                       // Idle block indicating no active check-in slot

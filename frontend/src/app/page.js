@@ -3,6 +3,8 @@
 
 // Import next/link to handle fast client-side transitions between routes
 import Link from 'next/link';
+// Import next/image for optimized image rendering
+import Image from 'next/image';
 // Import modern iconography from the lucide-react package for UI indicators
 import { Activity, MonitorPlay, Users, ArrowRight, ShieldCheck, HeartPulse } from 'lucide-react';
 
@@ -179,10 +181,13 @@ export default function Home() {
         <div className="lg:col-span-5 relative w-full h-[320px] sm:h-[450px] lg:h-[550px] rounded-3xl overflow-hidden shadow-2xl border-4 border-white dark:border-slate-800/80 group">
           
           {/* Main Visual Image representing the hospital reception environment */}
-          <img 
+          <Image 
             src="/hero-reception.png" 
             alt="HAQMS Hospital Reception Desk" 
-            className="w-full h-full object-cover transform scale-100 group-hover:scale-105 transition-transform duration-1000 ease-out"
+            fill
+            sizes="(max-width: 1024px) 100vw, 40vw"
+            priority
+            className="object-cover transform scale-100 group-hover:scale-105 transition-transform duration-1000 ease-out"
           />
 
           {/* Floating live status badge placed at the top-right corner of the image card */}

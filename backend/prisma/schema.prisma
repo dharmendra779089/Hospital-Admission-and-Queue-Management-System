@@ -87,4 +87,6 @@ model QueueToken {
 
   @@index([doctorId, createdAt])
   @@index([status])
+  @@index([patientId])
+  @@index([appointmentId])
 }

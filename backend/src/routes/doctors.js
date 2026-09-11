@@ -1,14 +1,12 @@
 // Import Express to define physician routes
 const express = require('express');
-// Import PrismaClient to interact with the database
-const { PrismaClient } = require('@prisma/client');
+// Import shared PrismaClient singleton instance
+const prisma = require('../prisma');
 // Import the authenticate middleware to secure routes
 const { authenticate } = require('../middleware/auth');
 
 // Create the Express router instance
 const router = express.Router();
-// Create the Prisma Client instance
-const prisma = new PrismaClient();
 
 // GET /api/doctors - Retrieve doctor registry list with optional search and filters
 router.get('/', authenticate, async (req, res) => {

@@ -4,13 +4,11 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 // Import jsonwebtoken to create signed user session tokens
 const jwt = require('jsonwebtoken');
-// Import PrismaClient to interact with the database
-const { PrismaClient } = require('@prisma/client');
+// Import shared PrismaClient singleton instance
+const prisma = require('../prisma');
 
 // Initialize the Express router instance
 const router = express.Router();
-// Initialize the Prisma database client
-const prisma = new PrismaClient();
 // Store the JWT secret loaded from environment variables
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -121,7 +119,7 @@ router.post('/login', async (req, res) => {
     // Log the error to stdout for debugging audits
     console.error('Login error:', error);
     // Return a clean 500 Internal Server Error without leaking internal server logs
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Internal server error during authentication' });
   }
 });
 

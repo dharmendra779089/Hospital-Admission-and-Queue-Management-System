@@ -7,9 +7,9 @@ services:
     env: node
     plan: free
     rootDir: backend
-    # Install dependencies, generate Prisma client, apply migrations, and seed the database
-    buildCommand: npm install && npx prisma generate
-    startCommand: (npx prisma db push --accept-data-loss --skip-generate || true) && (node prisma/seed.js || true) && npm start
+    # Install dependencies, generate Prisma client, and apply database migrations
+    buildCommand: npm install && npx prisma generate && (npx prisma migrate deploy || npx prisma db push --skip-generate)
+    startCommand: (node prisma/seed.js || true) && npm start
     envVars:
       # PostgreSQL database connection URL (linked to Render PostgreSQL instance)
       - key: DATABASE_URL
@@ -21,9 +21,9 @@ services:
         generateValue: true
       # Allow CORS requests from the frontend service
       - key: FRONTEND_URL
-        value: https://haqms-frontend-qk7k.onrender.com
+        value: https://haqms-frontend.onrender.com
       - key: NODE_ENV
-        value: development
+        value: production
 
   # ----------------------------------------------------
   # FRONTEND SERVICE (Next.js)
@@ -39,7 +39,7 @@ services:
     envVars:
       # Point the frontend to the backend service API
       - key: NEXT_PUBLIC_API_URL
-        value: https://haqms-backend-6zzd.onrender.com/api
+        value: https://haqms-backend.onrender.com/api
 
 # ----------------------------------------------------
 # DATABASE SERVICE (Render Managed PostgreSQL)
@@ -49,4 +49,3 @@ databases:
     plan: free
     databaseName: haqms
     user: postgres
-

@@ -1,14 +1,12 @@
 // Import Express to define patient registry router endpoints
 const express = require('express');
-// Import PrismaClient to execute queries on our tables
-const { PrismaClient } = require('@prisma/client');
-// Import authenticate, authorize, and authorizeAdminOnlyLegacy middlewares
-const { authenticate, authorize, authorizeAdminOnlyLegacy } = require('../middleware/auth');
+// Import shared PrismaClient singleton instance
+const prisma = require('../prisma');
+// Import authenticate and authorize middlewares
+const { authenticate, authorize } = require('../middleware/auth');
 
 // Create the Express router instance
 const router = express.Router();
-// Create the Prisma database client
-const prisma = new PrismaClient();
 
 // GET /api/patients - Fetch paginated and filtered patient directory
 router.get('/', authenticate, async (req, res) => {
@@ -161,7 +159,7 @@ router.delete('/:id', authenticate, authorize(['ADMIN', 'RECEPTIONIST']), async 
   } catch (error) {
     console.error('Failed to delete patient:', error);
     // Return a 500 status indicating deletion execution failure
-    res.status(500).json({ error: 'Failed to delete patient: ' + error.message });
+    res.status(500).json({ error: 'Failed to delete patient' });
   }
 });
 

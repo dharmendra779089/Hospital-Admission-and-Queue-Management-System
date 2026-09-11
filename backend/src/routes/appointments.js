@@ -1,14 +1,12 @@
 // Import Express to define appointment router endpoints
 const express = require('express');
-// Import PrismaClient to interact with the database
-const { PrismaClient } = require('@prisma/client');
+// Import shared PrismaClient singleton instance
+const prisma = require('../prisma');
 // Import the authenticate middleware to secure routes
 const { authenticate } = require('../middleware/auth');
 
 // Create the Express router instance
 const router = express.Router();
-// Create the Prisma database client
-const prisma = new PrismaClient();
 
 // GET /api/appointments - Retrieve scheduled bookings with filters
 router.get('/', authenticate, async (req, res) => {
@@ -68,31 +66,42 @@ router.post('/', authenticate, async (req, res) => {
     // Convert date string parameter into a standard JavaScript Date instance
     const appDate = new Date(appointmentDate);
 
-    // Check for an existing booking matching the same doctor and slot that is not cancelled
-    const existingBooking = await prisma.appointment.findFirst({
+    // Check for an existing booking matching the same doctor and slot
+    const existingSlot = await prisma.appointment.findFirst({
       where: {
         doctorId,
         appointmentDate: appDate,
-        status: { not: 'CANCELLED' },
       },
     });
 
-    // If a double-booking slot collision is detected
-    if (existingBooking) {
-      // Return 400 Bad Request error indicating slot unavailability
+    // If an active booking already occupies this slot
+    if (existingSlot && existingSlot.status !== 'CANCELLED') {
       return res.status(400).json({ error: 'Doctor already has an appointment at this time.' });
     }
 
-    // Insert new appointment record into database table
-    const appointment = await prisma.appointment.create({
-      data: {
-        patientId,
-        doctorId,
-        appointmentDate: appDate,
-        reason: reason || '',
-        status: 'PENDING', // Default new bookings status state to PENDING
-      },
-    });
+    let appointment;
+    if (existingSlot && existingSlot.status === 'CANCELLED') {
+      // Re-book the existing cancelled slot to satisfy unique constraint
+      appointment = await prisma.appointment.update({
+        where: { id: existingSlot.id },
+        data: {
+          patientId,
+          reason: reason || '',
+          status: 'PENDING',
+        },
+      });
+    } else {
+      // Insert new appointment record into database table
+      appointment = await prisma.appointment.create({
+        data: {
+          patientId,
+          doctorId,
+          appointmentDate: appDate,
+          reason: reason || '',
+          status: 'PENDING', // Default new bookings status state to PENDING
+        },
+      });
+    }
 
     // Respond with a 201 Created status code, return success message and appointment record
     res.status(201).json({ message: 'Appointment booked successfully', appointment });
