@@ -156,5 +156,22 @@ All seeded accounts use the password: **`password123`**
 
 ---
 
+## 🧪 Testing & Quality Assurance
+
+HAQMS features an automated 57-point end-to-end test suite covering authentication, RBAC, appointment scheduling, race-condition slot collision prevention, atomic queue state transitions, input validation, and performance benchmarking.
+
+### Run the Test Suite
+```bash
+npm test
+```
+
+### Test Coverage Highlights
+- **RBAC & Authorization**: Strict role-level guards for `ADMIN`, `DOCTOR`, and `RECEPTIONIST`.
+- **Concurrency & Race Conditions**: Atomic `$transaction` guards against duplicate check-ins and physician slot double-booking.
+- **Data Integrity & Boundaries**: Input sanitization, extreme age bounds (0–150), negative pagination handling, and empty clinical histories.
+- **Continuous Integration**: Automated GitHub Actions CI pipeline running linting, production build verification, and end-to-end integration tests on every commit.
+
+---
+
 ## 📄 License
 This project is open-source and available under the [MIT License](LICENSE).

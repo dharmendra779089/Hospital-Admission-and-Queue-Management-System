@@ -1,0 +1,474 @@
+{
+  "timestamp": "2026-09-12T15:21:10.829Z",
+  "summary": {
+    "total": 57,
+    "passed": 57,
+    "failed": 0,
+    "successRate": "100.0%",
+    "avgLatencyMs": 358,
+    "maxLatencyMs": 864,
+    "slowestTest": {
+      "id": "PERF-01",
+      "name": "Database Connection Pool 5x Parallel Burst Query",
+      "duration": 864
+    }
+  },
+  "tests": [
+    {
+      "id": "AUTH-01",
+      "name": "System Health Check Endpoint",
+      "phase": "Phase 1",
+      "status": "PASS",
+      "details": "Status: 200, Uptime: 2707.6s",
+      "duration": 761
+    },
+    {
+      "id": "AUTH-02",
+      "name": "Root Service Discovery Endpoint",
+      "phase": "Phase 1",
+      "status": "PASS",
+      "details": "Status: 200, Service: HAQMS REST API Server",
+      "duration": 341
+    },
+    {
+      "id": "AUTH-03",
+      "name": "Admin Role Authentication",
+      "phase": "Phase 1",
+      "status": "PASS",
+      "details": "Status: 200, Role: ADMIN",
+      "duration": 749
+    },
+    {
+      "id": "AUTH-04",
+      "name": "Doctor Role Authentication",
+      "phase": "Phase 1",
+      "status": "PASS",
+      "details": "Status: 200, Role: DOCTOR",
+      "duration": 774
+    },
+    {
+      "id": "AUTH-05",
+      "name": "Receptionist Role Authentication",
+      "phase": "Phase 1",
+      "status": "PASS",
+      "details": "Status: 200, Role: RECEPTIONIST",
+      "duration": 713
+    },
+    {
+      "id": "AUTH-06",
+      "name": "Rejection of Incorrect Password",
+      "phase": "Phase 1",
+      "status": "PASS",
+      "details": "Status: 401, Error: Invalid credentials",
+      "duration": 738
+    },
+    {
+      "id": "AUTH-07",
+      "name": "Rejection of Non-existent Email",
+      "phase": "Phase 1",
+      "status": "PASS",
+      "details": "Status: 401, Error: Invalid credentials",
+      "duration": 270
+    },
+    {
+      "id": "AUTH-08",
+      "name": "Rejection of Incomplete Credentials",
+      "phase": "Phase 1",
+      "status": "PASS",
+      "details": "Status: 400, Error: Email and password are required",
+      "duration": 282
+    },
+    {
+      "id": "AUTH-09",
+      "name": "Authenticated Profile Introspection (/api/auth/me)",
+      "phase": "Phase 1",
+      "status": "PASS",
+      "details": "Status: 200, User: System Administrator (ADMIN)",
+      "duration": 276
+    },
+    {
+      "id": "AUTH-10",
+      "name": "Access Denied on Missing Auth Token",
+      "phase": "Phase 1",
+      "status": "PASS",
+      "details": "Status: 401, Error: Access denied. No token provided.",
+      "duration": 316
+    },
+    {
+      "id": "AUTH-11",
+      "name": "Access Denied on Forged / Malformed JWT",
+      "phase": "Phase 1",
+      "status": "PASS",
+      "details": "Status: 401, Error: Invalid or expired token.",
+      "duration": 276
+    },
+    {
+      "id": "AUTH-12",
+      "name": "New User Self-Registration",
+      "phase": "Phase 1",
+      "status": "PASS",
+      "details": "Status: 201, Created ID: c505a160-25d4-4283-98ef-fd14daf40a65",
+      "duration": 720
+    },
+    {
+      "id": "AUTH-13",
+      "name": "Duplicate Registration Email Collision Rejection",
+      "phase": "Phase 1",
+      "status": "PASS",
+      "details": "Status: 400, Error: User already exists with this email",
+      "duration": 273
+    },
+    {
+      "id": "DOC-01",
+      "name": "Retrieve Complete Doctor Registry",
+      "phase": "Phase 2",
+      "status": "PASS",
+      "details": "Status: 200, Total Doctors Found: 5",
+      "duration": 284
+    },
+    {
+      "id": "DOC-02",
+      "name": "Filter Doctors by Specialization (Cardiology)",
+      "phase": "Phase 2",
+      "status": "PASS",
+      "details": "Status: 200, Count: 1",
+      "duration": 283
+    },
+    {
+      "id": "DOC-03",
+      "name": "Search Doctors by Name Substring (\"House\")",
+      "phase": "Phase 2",
+      "status": "PASS",
+      "details": "Status: 200, Matches: 1",
+      "duration": 282
+    },
+    {
+      "id": "DOC-04",
+      "name": "Doctor Aggregated Metrics (Average Fee, Experience)",
+      "phase": "Phase 2",
+      "status": "PASS",
+      "details": "Status: 200, AvgFee: ₹250, MaxExp: 20yrs",
+      "duration": 300
+    },
+    {
+      "id": "DOC-05",
+      "name": "Fetch Physician by Valid UUID",
+      "phase": "Phase 2",
+      "status": "PASS",
+      "details": "Status: 200, Doctor: Dr. Gregory House (Diagnostics)",
+      "duration": 282
+    },
+    {
+      "id": "DOC-06",
+      "name": "Rejection of Non-existent Physician UUID (404)",
+      "phase": "Phase 2",
+      "status": "PASS",
+      "details": "Status: 404, Error: Doctor not found",
+      "duration": 264
+    },
+    {
+      "id": "PAT-01",
+      "name": "Paginated Patient Directory Retrieval",
+      "phase": "Phase 3",
+      "status": "PASS",
+      "details": "Status: 200, Total In DB: 16, Page 1 Items: 5",
+      "duration": 283
+    },
+    {
+      "id": "PAT-02",
+      "name": "Negative Pagination Bound Normalization",
+      "phase": "Phase 3",
+      "status": "PASS",
+      "details": "Status: 200, Normalized Page: 1, Limit: 1",
+      "duration": 282
+    },
+    {
+      "id": "PAT-03",
+      "name": "Pagination Page Size Capping (Max 100)",
+      "phase": "Phase 3",
+      "status": "PASS",
+      "details": "Status: 200, Capped Limit: 100",
+      "duration": 270
+    },
+    {
+      "id": "PAT-04",
+      "name": "Filter Patients by Gender (Female)",
+      "phase": "Phase 3",
+      "status": "PASS",
+      "details": "Status: 200, Matched: 5",
+      "duration": 286
+    },
+    {
+      "id": "PAT-05",
+      "name": "Register New Patient Profile",
+      "phase": "Phase 3",
+      "status": "PASS",
+      "details": "Status: 201, Registered ID: bf71a4ff-66aa-4b04-8ef7-f49d554c5a1a",
+      "duration": 260
+    },
+    {
+      "id": "PAT-06",
+      "name": "Register Patient with Empty History (Handled as Null)",
+      "phase": "Phase 3",
+      "status": "PASS",
+      "details": "Status: 201, MedicalHistory: null",
+      "duration": 286
+    },
+    {
+      "id": "PAT-07",
+      "name": "Boundary Validation: Negative Age Rejection (-5)",
+      "phase": "Phase 3",
+      "status": "PASS",
+      "details": "Status: 400, Error: Valid age between 0 and 150 is required.",
+      "duration": 310
+    },
+    {
+      "id": "PAT-08",
+      "name": "Boundary Validation: Extreme Age Rejection (180)",
+      "phase": "Phase 3",
+      "status": "PASS",
+      "details": "Status: 400, Error: Valid age between 0 and 150 is required.",
+      "duration": 278
+    },
+    {
+      "id": "PAT-09",
+      "name": "Rejection of Incomplete Patient Registration Body",
+      "phase": "Phase 3",
+      "status": "PASS",
+      "details": "Status: 400, Error: Name, phoneNumber, age, and gender are required.",
+      "duration": 311
+    },
+    {
+      "id": "PAT-10",
+      "name": "Fetch Patient Deep Profile with Appointments History",
+      "phase": "Phase 3",
+      "status": "PASS",
+      "details": "Status: 200, Patient: Automated Test Patient, Prior Bookings: 0",
+      "duration": 264
+    },
+    {
+      "id": "PAT-11",
+      "name": "Non-existent Patient UUID Lookup (404)",
+      "phase": "Phase 3",
+      "status": "PASS",
+      "details": "Status: 404, Error: Patient not found",
+      "duration": 278
+    },
+    {
+      "id": "PAT-12",
+      "name": "RBAC Enforcement: Doctor Role Forbidden to Delete Patient",
+      "phase": "Phase 3",
+      "status": "PASS",
+      "details": "Status: 403, Error: Forbidden. Requires role: ADMIN or RECEPTIONIST",
+      "duration": 257
+    },
+    {
+      "id": "APT-01",
+      "name": "Retrieve Scheduled Hospital Appointments List",
+      "phase": "Phase 4",
+      "status": "PASS",
+      "details": "Status: 200, Existing Bookings: 14",
+      "duration": 557
+    },
+    {
+      "id": "APT-02",
+      "name": "Schedule New Appointment Slot (Status: PENDING)",
+      "phase": "Phase 4",
+      "status": "PASS",
+      "details": "Status: 201, Booking ID: 6fbf28f3-8b1a-4f27-b38c-1d199b374469",
+      "duration": 270
+    },
+    {
+      "id": "APT-03",
+      "name": "Physician Slot Collision / Double-Booking Prevention",
+      "phase": "Phase 4",
+      "status": "PASS",
+      "details": "Status: 400, Rejected with: \"Doctor already has an appointment at this time.\"",
+      "duration": 272
+    },
+    {
+      "id": "APT-04",
+      "name": "Malformed Appointment Date Validation",
+      "phase": "Phase 4",
+      "status": "PASS",
+      "details": "Status: 400, Error: Valid appointmentDate is required.",
+      "duration": 273
+    },
+    {
+      "id": "APT-05",
+      "name": "Update Appointment Status State Machine (-> CHECKED_IN)",
+      "phase": "Phase 4",
+      "status": "PASS",
+      "details": "Status: 200, New State: CHECKED_IN",
+      "duration": 280
+    },
+    {
+      "id": "APT-06",
+      "name": "Rejection of Invalid Status Enum",
+      "phase": "Phase 4",
+      "status": "PASS",
+      "details": "Status: 400, Error: Invalid status. Must be one of: PENDING, CHECKED_IN, COMPLETED, CANCELLED",
+      "duration": 331
+    },
+    {
+      "id": "QUE-01",
+      "name": "Walk-in Patient Check-in ($transaction Atomic Token)",
+      "phase": "Phase 5",
+      "status": "PASS",
+      "details": "Status: 201, Generated Token #10",
+      "duration": 311
+    },
+    {
+      "id": "QUE-02",
+      "name": "Sequential Token Number Increment Logic (N+1)",
+      "phase": "Phase 5",
+      "status": "PASS",
+      "details": "Status: 201, Next Token #11 (Expected #11)",
+      "duration": 297
+    },
+    {
+      "id": "QUE-03",
+      "name": "Duplicate Appointment Check-in Prevention Guard",
+      "phase": "Phase 5",
+      "status": "PASS",
+      "details": "Status: 400, Error: Patient is already checked in for this appointment with Token #12",
+      "duration": 327
+    },
+    {
+      "id": "QUE-04",
+      "name": "Retrieve Active Waiting/Calling Queue Tokens",
+      "phase": "Phase 5",
+      "status": "PASS",
+      "details": "Status: 200, Active Waiting Tokens: 13",
+      "duration": 323
+    },
+    {
+      "id": "QUE-05",
+      "name": "Physician Calls Patient Token (-> CALLING)",
+      "phase": "Phase 5",
+      "status": "PASS",
+      "details": "Status: 200, State: CALLING",
+      "duration": 283
+    },
+    {
+      "id": "QUE-06",
+      "name": "Physician Concludes Consultation (-> COMPLETED)",
+      "phase": "Phase 5",
+      "status": "PASS",
+      "details": "Status: 200, State: COMPLETED",
+      "duration": 305
+    },
+    {
+      "id": "QUE-07",
+      "name": "Rejection of Illegal Queue Status Enum",
+      "phase": "Phase 5",
+      "status": "PASS",
+      "details": "Status: 400, Error: Invalid status. Must be one of: WAITING, CALLING, COMPLETED, SKIPPED, CANCELLED",
+      "duration": 257
+    },
+    {
+      "id": "MON-01",
+      "name": "Public Live Queue Display Feed (No Auth Required)",
+      "phase": "Phase 6",
+      "status": "PASS",
+      "details": "Status: 200, Public Tokens Visible: 12",
+      "duration": 263
+    },
+    {
+      "id": "MON-02",
+      "name": "Scoping Live Queue Feed to Specific Doctor Chamber",
+      "phase": "Phase 6",
+      "status": "PASS",
+      "details": "Status: 200, Tokens in Chamber: 9",
+      "duration": 273
+    },
+    {
+      "id": "REP-01",
+      "name": "Executive Report Access (ADMIN Permitted)",
+      "phase": "Phase 7",
+      "status": "PASS",
+      "details": "Status: 200, Doctors Analyzed: 5",
+      "duration": 317
+    },
+    {
+      "id": "REP-02",
+      "name": "RBAC Enforcement: DOCTOR Blocked from Executive Reports (403)",
+      "phase": "Phase 7",
+      "status": "PASS",
+      "details": "Status: 403, Error: Forbidden. Requires role: ADMIN",
+      "duration": 274
+    },
+    {
+      "id": "REP-03",
+      "name": "RBAC Enforcement: RECEPTIONIST Blocked from Executive Reports (403)",
+      "phase": "Phase 7",
+      "status": "PASS",
+      "details": "Status: 403, Error: Forbidden. Requires role: ADMIN",
+      "duration": 278
+    },
+    {
+      "id": "REP-04",
+      "name": "Unauthorized Access Blocked from Executive Reports (401)",
+      "phase": "Phase 7",
+      "status": "PASS",
+      "details": "Status: 401, Error: Access denied. No token provided.",
+      "duration": 289
+    },
+    {
+      "id": "SEC-01",
+      "name": "SQL Injection Mitigation (Edge WAF & Prisma Parameterization)",
+      "phase": "Phase 8",
+      "status": "PASS",
+      "details": "Status: 403, Safely blocked/parameterized without SQL leak",
+      "duration": 233
+    },
+    {
+      "id": "SEC-02",
+      "name": "SQL Injection Mitigation in Authentication Flow",
+      "phase": "Phase 8",
+      "status": "PASS",
+      "details": "Status: 401, Denied with 401",
+      "duration": 296
+    },
+    {
+      "id": "SEC-03",
+      "name": "Safe Storage of Scripting Characters without Evaluation",
+      "phase": "Phase 8",
+      "status": "PASS",
+      "details": "Status: 201, Stored safely as raw string",
+      "duration": 281
+    },
+    {
+      "id": "PERF-01",
+      "name": "Database Connection Pool 5x Parallel Burst Query",
+      "phase": "Phase 9",
+      "status": "PASS",
+      "details": "All 5 returned 200 OK. Total Burst Duration: 864ms (Avg 173ms/req)",
+      "duration": 864
+    },
+    {
+      "id": "FE-01",
+      "name": "Frontend Landing / Gateway Route Response",
+      "phase": "Phase 10",
+      "status": "PASS",
+      "details": "Status: 200",
+      "duration": 330
+    },
+    {
+      "id": "FE-02",
+      "name": "Frontend Authentication UI Route (/login)",
+      "phase": "Phase 10",
+      "status": "PASS",
+      "details": "Status: 200",
+      "duration": 762
+    },
+    {
+      "id": "FE-03",
+      "name": "Frontend Public Queue Monitor UI Route (/queue)",
+      "phase": "Phase 10",
+      "status": "PASS",
+      "details": "Status: 200",
+      "duration": 299
+    }
+  ]
+}
