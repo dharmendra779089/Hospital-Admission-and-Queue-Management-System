@@ -7,7 +7,7 @@ export default function NotFound() {
   return (
     <div className="flex flex-col min-h-screen justify-center items-center py-12 px-6 lg:px-8 text-center">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <Link href="/" className="inline-flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-extrabold text-3xl mb-8">
+        <Link href="/" className="inline-flex items-center gap-2 text-indigo-600 font-extrabold text-3xl mb-8">
           <Activity className="h-8 w-8 animate-pulse" />
           HAQMS
         </Link>
@@ -17,12 +17,12 @@ export default function NotFound() {
             <ShieldAlert className="h-10 w-10 animate-bounce" />
           </div>
           
-          <h2 className="text-4xl font-black text-slate-800 dark:text-slate-100">404</h2>
-          <h3 className="mt-2 text-xl font-bold text-slate-800 dark:text-slate-100">
+          <h2 className="text-4xl font-black text-slate-800">404</h2>
+          <h3 className="mt-2 text-xl font-bold text-slate-800">
             Page Not Found
           </h3>
           
-          <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">
+          <p className="mt-4 text-sm text-slate-500">
             The page or clinical resource you are looking for does not exist or has been moved.
             Please verify the address or return to the management dashboard.
           </p>

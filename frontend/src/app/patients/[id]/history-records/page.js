@@ -100,7 +100,7 @@ export default function PatientHistoryRecords({ params }) {
 
   return (
     // Outer flex wrapper styling backgrounds for dark and light modes
-    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100">
+    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-800">
       {/* Shared navigation header */}
       <Navbar />
       
@@ -112,7 +112,7 @@ export default function PatientHistoryRecords({ params }) {
           {/* Back link CTA */}
           <button
             onClick={() => router.push('/dashboard')}
-            className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors group"
+            className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-indigo-600:text-indigo-400 transition-colors group"
           >
             <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
             Back to Registry Dashboard
@@ -122,7 +122,7 @@ export default function PatientHistoryRecords({ params }) {
           {patient && (
             <button
               onClick={handlePrint}
-              className="glow-btn flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white dark:bg-indigo-500 dark:text-slate-950 dark:hover:bg-indigo-400 font-extrabold text-xs rounded-xl shadow-md transition-all duration-300"
+              className="glow-btn flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white:bg-indigo-400 font-extrabold text-xs rounded-xl shadow-md transition-all duration-300"
             >
               <Printer className="h-4 w-4" />
               Print Diagnostic History
@@ -132,7 +132,7 @@ export default function PatientHistoryRecords({ params }) {
 
         {/* Floating status alert for printing task dispatch */}
         {printSuccess && (
-          <div className="p-3 mb-6 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center gap-2 text-xs font-bold animate-pulse">
+          <div className="p-3 mb-6 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 flex items-center gap-2 text-xs font-bold animate-pulse">
             <CheckCircle2 className="h-4 w-4" />
             Generating report printing payload...
           </div>
@@ -154,7 +154,7 @@ export default function PatientHistoryRecords({ params }) {
           // Renders access failure alert if authorization failed or ID is invalid
           <div className="glass p-8 text-center rounded-2xl border border-rose-500/20 max-w-md mx-auto">
             <ShieldAlert className="h-12 w-12 text-rose-500 mx-auto mb-4 animate-bounce" />
-            <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">Access Failure</h3>
+            <h3 className="text-lg font-bold text-slate-800">Access Failure</h3>
             <p className="mt-2 text-slate-500 text-sm">{error}</p>
           </div>
         ) : (
@@ -162,42 +162,42 @@ export default function PatientHistoryRecords({ params }) {
           <div className="space-y-8">
             
             {/* Patient Header Block styled with glassmorphic cards */}
-            <div className="glass p-6 sm:p-8 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-800 relative overflow-hidden">
+            <div className="glass p-6 sm:p-8 rounded-2xl shadow-lg border border-slate-200 relative overflow-hidden">
               {/* Background decorative watermark */}
-              <div className="absolute top-0 right-0 p-6 opacity-5 dark:opacity-10 text-indigo-500">
+              <div className="absolute top-0 right-0 p-6 opacity-5 text-indigo-500">
                 <HeartPulse className="h-24 w-24" />
               </div>
               {/* Name and Metadata identifiers */}
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div className="flex items-center gap-4">
                   {/* User profile symbol container */}
-                  <div className="p-4 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-2xl border border-indigo-500/20 shadow-inner">
+                  <div className="p-4 bg-indigo-500/10 text-indigo-600 rounded-2xl border border-indigo-500/20 shadow-inner">
                     <User className="h-8 w-8" />
                   </div>
                   <div>
                     {/* Badge */}
-                    <span className="text-xxs font-extrabold uppercase tracking-widest text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
+                    <span className="text-xxs font-extrabold uppercase tracking-widest text-indigo-600 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
                       Clinical Health Record
                     </span>
                     {/* Patient Name */}
-                    <h1 className="text-3xl font-black text-slate-800 dark:text-slate-100 mt-2.5 leading-tight">
+                    <h1 className="text-3xl font-black text-slate-800 mt-2.5 leading-tight">
                       {patient.name}
                     </h1>
                   </div>
                 </div>
                 {/* Right side information summary grid */}
-                <div className="grid grid-cols-3 gap-6 text-xs text-center border-t sm:border-t-0 sm:border-l border-slate-200 dark:border-slate-800 pt-4 sm:pt-0 sm:pl-8">
+                <div className="grid grid-cols-3 gap-6 text-xs text-center border-t sm:border-t-0 sm:border-l border-slate-200 pt-4 sm:pt-0 sm:pl-8">
                   <div>
                     <span className="block text-slate-400 font-bold uppercase tracking-wider text-xxs">Age</span>
-                    <span className="block text-lg font-black text-slate-800 dark:text-slate-200 mt-1">{patient.age} yrs</span>
+                    <span className="block text-lg font-black text-slate-800 mt-1">{patient.age} yrs</span>
                   </div>
                   <div>
                     <span className="block text-slate-400 font-bold uppercase tracking-wider text-xxs">Sex</span>
-                    <span className="block text-lg font-black text-slate-800 dark:text-slate-200 mt-1 capitalize">{patient.gender}</span>
+                    <span className="block text-lg font-black text-slate-800 mt-1 capitalize">{patient.gender}</span>
                   </div>
                   <div>
                     <span className="block text-slate-400 font-bold uppercase tracking-wider text-xxs">Contact</span>
-                    <span className="block text-lg font-black text-slate-800 dark:text-slate-200 mt-1 font-mono">{patient.phoneNumber}</span>
+                    <span className="block text-lg font-black text-slate-800 mt-1 font-mono">{patient.phoneNumber}</span>
                   </div>
                 </div>
               </div>
@@ -207,22 +207,22 @@ export default function PatientHistoryRecords({ params }) {
             <div className="grid gap-8 md:grid-cols-3">
               
               {/* Medical History Sidebar */}
-              <div className="glass p-6 rounded-2xl shadow-md border border-slate-200 dark:border-slate-800 h-fit space-y-4">
+              <div className="glass p-6 rounded-2xl shadow-md border border-slate-200 h-fit space-y-4">
                 {/* Sidebar Header */}
                 <h3 className="text-sm font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                   <Activity className="h-4.5 w-4.5 text-indigo-600" />
                   Clinical Anamnesis
                 </h3>
                 {/* Background medical summary string */}
-                <div className="p-4 rounded-xl bg-slate-500/5 border border-slate-200 dark:border-slate-800/60">
-                  <p className="text-xs font-semibold leading-relaxed text-slate-600 dark:text-slate-300">
+                <div className="p-4 rounded-xl bg-slate-500/5 border border-slate-200">
+                  <p className="text-xs font-semibold leading-relaxed text-slate-600">
                     {patient.medicalHistory || 'No baseline medical history recorded on file.'}
                   </p>
                 </div>
               </div>
 
               {/* Chronological Consultation Timeline */}
-              <div className="md:col-span-2 glass p-6 sm:p-8 rounded-2xl shadow-md border border-slate-200 dark:border-slate-800 space-y-6">
+              <div className="md:col-span-2 glass p-6 sm:p-8 rounded-2xl shadow-md border border-slate-200 space-y-6">
                 {/* Section Header */}
                 <h3 className="text-sm font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                   <FileText className="h-4.5 w-4.5 text-indigo-600" />
@@ -232,24 +232,24 @@ export default function PatientHistoryRecords({ params }) {
                 {/* Conditional checking if any consultations are present */}
                 {!patient.appointments || patient.appointments.length === 0 ? (
                   // Empty placeholder block
-                  <div className="text-center py-12 border border-dashed border-slate-200 dark:border-slate-800 rounded-xl">
+                  <div className="text-center py-12 border border-dashed border-slate-200 rounded-xl">
                     <Clock className="h-8 w-8 text-slate-400 mx-auto mb-2 animate-pulse" />
                     <p className="text-xs font-semibold text-slate-400">No appointments recorded for this patient.</p>
                   </div>
                 ) : (
                   // Timeline container with vertical connector bar
-                  <div className="relative pl-6 border-l border-slate-200 dark:border-slate-800 space-y-8">
+                  <div className="relative pl-6 border-l border-slate-200 space-y-8">
                     {/* Map through patient's appointment records */}
                     {patient.appointments.map((appt) => (
                       <div key={appt.id} className="relative group">
                         
                         {/* Timeline Connector Dot, dynamic border colors based on status */}
-                        <span className={`absolute -left-9 top-1.5 p-1 rounded-full border bg-slate-50 dark:bg-slate-950 transition-all ${appt.status === 'COMPLETED' ? 'border-indigo-500 text-indigo-500' : appt.status === 'CANCELLED' ? 'border-rose-500 text-rose-500' : 'border-amber-500 text-amber-500'}`}>
+                        <span className={`absolute -left-9 top-1.5 p-1 rounded-full border bg-slate-50 transition-all ${appt.status === 'COMPLETED' ? 'border-indigo-500 text-indigo-500' : appt.status === 'CANCELLED' ? 'border-rose-500 text-rose-500' : 'border-amber-500 text-amber-500'}`}>
                           <div className="h-2 w-2 rounded-full bg-current" />
                         </span>
 
                         {/* Timeline Card */}
-                        <div className="glass p-5 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-indigo-500/30 dark:hover:border-indigo-500/20 hover:shadow-md transition-all duration-300">
+                        <div className="glass p-5 rounded-2xl border border-slate-200 hover:border-indigo-500/30:border-indigo-500/20 hover:shadow-md transition-all duration-300">
                           {/* Header section wrapping appointment timestamp and badge */}
                           <div className="flex justify-between items-start gap-4 flex-wrap">
                             {/* Calendar icon and formatted timestamp */}
@@ -258,7 +258,7 @@ export default function PatientHistoryRecords({ params }) {
                               {new Date(appt.appointmentDate).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
                             </span>
                             {/* Dynamic status badge */}
-                            <span className={`px-2 py-0.5 rounded text-xxs font-extrabold uppercase tracking-wide ${appt.status === 'COMPLETED' ? 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400' : appt.status === 'CANCELLED' ? 'bg-rose-500/10 text-rose-500' : 'bg-amber-500/10 text-amber-500'}`}>
+                            <span className={`px-2 py-0.5 rounded text-xxs font-extrabold uppercase tracking-wide ${appt.status === 'COMPLETED' ? 'bg-indigo-500/10 text-indigo-600' : appt.status === 'CANCELLED' ? 'bg-rose-500/10 text-rose-500' : 'bg-amber-500/10 text-amber-500'}`}>
                               {appt.status}
                             </span>
                           </div>
@@ -266,7 +266,7 @@ export default function PatientHistoryRecords({ params }) {
                           {/* Diagnostic reasoning details */}
                           <div className="mt-4">
                             <span className="block text-slate-400 font-bold uppercase tracking-wider text-xxs">Objective / Clinical Reason</span>
-                            <p className="mt-1 text-sm font-semibold text-slate-700 dark:text-slate-200">
+                            <p className="mt-1 text-sm font-semibold text-slate-700">
                               {appt.reason || 'Routine general wellness review'}
                             </p>
                           </div>

@@ -70,17 +70,17 @@ export default function Login() {
       {/* Brand headers with responsive grid sizes */}
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
         {/* Clickable link pointing to the landing page */}
-        <Link href="/" className="inline-flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-extrabold text-3xl">
+        <Link href="/" className="inline-flex items-center gap-2 text-indigo-600 font-extrabold text-3xl">
           {/* Animated pulse activity icon */}
           <Activity className="h-8 w-8 animate-pulse" />
           HAQMS
         </Link>
         {/* Main form description heading */}
-        <h2 className="mt-6 text-3xl font-extrabold text-slate-800 dark:text-slate-100">
+        <h2 className="mt-6 text-3xl font-extrabold text-slate-800">
           Sign in to your account
         </h2>
         {/* Subtitle helper */}
-        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+        <p className="mt-2 text-sm text-slate-500">
           Sign in to access your clinical dashboard or choose a demo role below
         </p>
       </div>
@@ -88,7 +88,7 @@ export default function Login() {
       {/* Login container holding the glassmorphic form card */}
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         {/* Premium glassmorphic container styled with subtle borders and shadows */}
-        <div className="glass py-8 px-6 shadow-xl rounded-2xl border border-slate-200 dark:border-slate-800">
+        <div className="glass py-8 px-6 shadow-xl rounded-2xl border border-slate-200">
           {/* Main submit form executing the handleSubmit callback */}
           <form className="space-y-6" onSubmit={handleSubmit}>
             {/* Conditional warning box rendered if local validation or authentication errors exist */}
@@ -102,7 +102,7 @@ export default function Login() {
             {/* Email Input Field Group */}
             <div>
               {/* Field Label */}
-              <label htmlFor="email" className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+              <label htmlFor="email" className="block text-sm font-semibold text-slate-700">
                 Email Address
               </label>
               {/* Input Wrapper containing inline icon spacing */}
@@ -118,7 +118,7 @@ export default function Login() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2 border border-slate-300 dark:border-slate-700 bg-white/50 dark:bg-slate-900/50 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-sm"
+                  className="block w-full pl-10 pr-3 py-2 border border-slate-300 bg-white rounded-lg text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-sm"
                   placeholder="admin@haqms.com"
                 />
               </div>
@@ -127,7 +127,7 @@ export default function Login() {
             {/* Password Input Field Group */}
             <div>
               {/* Field Label */}
-              <label htmlFor="password" className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+              <label htmlFor="password" className="block text-sm font-semibold text-slate-700">
                 Password
               </label>
               {/* Input Wrapper containing inline icon and view toggle button spacing */}
@@ -143,7 +143,7 @@ export default function Login() {
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-10 pr-10 py-2 border border-slate-300 dark:border-slate-700 bg-white/50 dark:bg-slate-900/50 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-sm"
+                  className="block w-full pl-10 pr-10 py-2 border border-slate-300 bg-white rounded-lg text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-sm"
                   placeholder="••••••••"
                 />
                 {/* Suffix button allowing user to show/hide plaintext password digits */}
@@ -172,7 +172,7 @@ export default function Login() {
           </form>
 
           {/* Quick seeded login panel for instant role-based testing */}
-          <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800">
+          <div className="mt-8 pt-6 border-t border-slate-200">
             <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Seeded Demo Credentials</h4>
             {/* Grid containing preset credentials buttons */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
@@ -180,7 +180,7 @@ export default function Login() {
               <button
                 type="button"
                 onClick={() => { setEmail('admin@haqms.com'); setPassword('password123'); }}
-                className="text-left p-2 rounded bg-slate-100 dark:bg-slate-800 hover:bg-indigo-500/10 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors text-slate-600 dark:text-slate-300"
+                className="text-left p-2 rounded bg-slate-100 hover:bg-indigo-500/10 hover:text-indigo-600:text-indigo-400 transition-colors text-slate-600"
               >
                 <strong>Admin:</strong> admin@haqms.com
               </button>
@@ -188,7 +188,7 @@ export default function Login() {
               <button
                 type="button"
                 onClick={() => { setEmail('reception1@haqms.com'); setPassword('password123'); }}
-                className="text-left p-2 rounded bg-slate-100 dark:bg-slate-800 hover:bg-indigo-500/10 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors text-slate-600 dark:text-slate-300"
+                className="text-left p-2 rounded bg-slate-100 hover:bg-indigo-500/10 hover:text-indigo-600:text-indigo-400 transition-colors text-slate-600"
               >
                 <strong>Receptionist:</strong> reception1@haqms.com
               </button>
@@ -196,7 +196,7 @@ export default function Login() {
               <button
                 type="button"
                 onClick={() => { setEmail('doctor1@haqms.com'); setPassword('password123'); }}
-                className="text-left p-2 rounded bg-slate-100 dark:bg-slate-800 hover:bg-indigo-500/10 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors text-slate-600 dark:text-slate-300"
+                className="text-left p-2 rounded bg-slate-100 hover:bg-indigo-500/10 hover:text-indigo-600:text-indigo-400 transition-colors text-slate-600"
               >
                 <strong>Doctor:</strong> doctor1@haqms.com
               </button>
