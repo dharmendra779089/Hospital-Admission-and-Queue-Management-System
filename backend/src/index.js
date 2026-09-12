@@ -58,6 +58,24 @@ app.get(['/health', '/api/health'], (req, res) => {
   res.status(200).json({ status: 'OK', uptime: process.uptime(), timestamp: new Date().toISOString() });
 });
 
+// Root API welcome endpoint
+app.get('/', (req, res) => {
+  res.status(200).json({
+    name: 'HAQMS REST API Server',
+    status: 'Online',
+    version: '1.0.0',
+    endpoints: {
+      health: '/health',
+      auth: '/api/auth',
+      doctors: '/api/doctors',
+      patients: '/api/patients',
+      appointments: '/api/appointments',
+      queue: '/api/queue',
+      reports: '/api/reports',
+    },
+  });
+});
+
 // Register API base paths to route handler modules
 app.use('/api/auth', authRoutes);
 app.use('/api/doctors', doctorRoutes);
