@@ -21,7 +21,7 @@ services:
         generateValue: true
       # Allow CORS requests from the frontend service
       - key: FRONTEND_URL
-        value: https://haqms-frontend.onrender.com
+        value: https://haqms-frontend-wjzn.onrender.com
       - key: NODE_ENV
         value: production
 
@@ -39,7 +39,7 @@ services:
     envVars:
       # Point the frontend to the backend service API
       - key: NEXT_PUBLIC_API_URL
-        value: https://haqms-backend.onrender.com/api
+        value: https://haqms-backend-tz6y.onrender.com/api
 
 # ----------------------------------------------------
 # DATABASE SERVICE (Render Managed PostgreSQL)

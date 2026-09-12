@@ -19,8 +19,17 @@ export default function QueueMonitor() {
   // State hook to keep track of the number of API poll requests completed
   const [refreshCount, setRefreshCount] = useState(0);
 
-  // Retrieve the public backend URL from environment variables, fallback to local dev server
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+  // Retrieve the public backend URL from environment variables, fallback to active Render backend or local dev server
+  const API_BASE_URL = (() => {
+    const envUrl = process.env.NEXT_PUBLIC_API_URL;
+    if (envUrl && envUrl !== 'https://haqms-backend.onrender.com/api') {
+      return envUrl;
+    }
+    if (typeof window !== 'undefined' && window.location.hostname.includes('onrender.com')) {
+      return 'https://haqms-backend-tz6y.onrender.com/api';
+    }
+    return envUrl || 'http://localhost:5000/api';
+  })();
 
   // Set up polling side effect with proper lifecycle cleanup and cancellation guard
   useEffect(() => {

@@ -21,8 +21,17 @@ export function AuthProvider({ children }) {
   // Instantiate the Next.js client router controller
   const router = useRouter();
 
-  // Configure the API base endpoint dynamically from environment variables
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+  // Configure the API base endpoint dynamically from environment variables with fallback for Render deployments
+  const API_BASE_URL = (() => {
+    const envUrl = process.env.NEXT_PUBLIC_API_URL;
+    if (envUrl && envUrl !== 'https://haqms-backend.onrender.com/api') {
+      return envUrl;
+    }
+    if (typeof window !== 'undefined' && window.location.hostname.includes('onrender.com')) {
+      return 'https://haqms-backend-tz6y.onrender.com/api';
+    }
+    return envUrl || 'http://localhost:5000/api';
+  })();
 
   // Define credentials logout cleanup helper with useCallback
   const logout = useCallback(() => {
