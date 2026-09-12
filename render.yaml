@@ -48,4 +48,4 @@ databases:
   - name: haqms-db
     plan: free
     databaseName: haqms
-    user: postgres
+    user: haqms_user
