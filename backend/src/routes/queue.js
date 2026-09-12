@@ -66,6 +66,21 @@ router.post('/checkin', authenticate, async (req, res) => {
       const now = new Date();
       const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0, 0));
 
+      // If an appointment is associated, verify it isn't already actively checked in
+      if (appointmentId) {
+        const existingToken = await tx.queueToken.findFirst({
+          where: {
+            appointmentId,
+            status: { in: ['WAITING', 'CALLING'] },
+          },
+        });
+        if (existingToken) {
+          const dupError = new Error(`Patient is already checked in for this appointment with Token #${existingToken.tokenNumber}`);
+          dupError.statusCode = 400;
+          throw dupError;
+        }
+      }
+
       // Compute current max token number for this physician today
       const maxTokenResult = await tx.queueToken.aggregate({
         where: {
@@ -110,6 +125,9 @@ router.post('/checkin', authenticate, async (req, res) => {
       token: newToken,
     });
   } catch (error) {
+    if (error.statusCode === 400) {
+      return res.status(400).json({ error: error.message });
+    }
     console.error('Queue check-in transaction error:', error);
     res.status(500).json({ error: 'Check-in transaction failed' });
   }
@@ -122,6 +140,18 @@ router.patch('/:id', authenticate, async (req, res) => {
 
     if (!status) {
       return res.status(400).json({ error: 'Status is required' });
+    }
+
+    const validStatuses = ['WAITING', 'CALLING', 'COMPLETED', 'SKIPPED', 'CANCELLED'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ error: `Invalid status. Must be one of: ${validStatuses.join(', ')}` });
+    }
+
+    const existing = await prisma.queueToken.findUnique({
+      where: { id: req.params.id },
+    });
+    if (!existing) {
+      return res.status(404).json({ error: 'Queue token not found' });
     }
 
     const updatedToken = await prisma.queueToken.update({

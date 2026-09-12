@@ -71,8 +71,9 @@ router.get('/stats', authenticate, async (req, res) => {
     });
   // Handle database aggregation failures
   } catch (error) {
+    console.error('Failed to fetch doctor stats:', error);
     // Return a 500 status code returning the exception details
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Failed to fetch doctor stats' });
   }
 });
 
@@ -95,8 +96,9 @@ router.get('/:id', authenticate, async (req, res) => {
     res.json(doctor);
   // Catch database execution exceptions
   } catch (error) {
+    console.error('Failed to fetch doctor:', error);
     // Return a 500 status indicating transaction error
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Failed to fetch doctor' });
   }
 });
 

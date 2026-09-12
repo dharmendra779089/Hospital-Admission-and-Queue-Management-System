@@ -26,10 +26,10 @@ import {
 
 // Main PatientHistoryRecords component receiving dynamic routing params
 export default function PatientHistoryRecords({ params }) {
-  // In Next.js App Router, params is a Promise that must be unwrapped using the React 'use' hook
-  const unwrappedParams = use(params);
+  // Safely unwrap params if passed as a Promise (Next.js App Router) or plain object
+  const unwrappedParams = params && typeof params.then === 'function' ? use(params) : params;
   // Extract the specific patient ID string from the resolved parameters
-  const patientId = unwrappedParams.id;
+  const patientId = unwrappedParams?.id;
 
   // Retrieve authorized request headers token and backend API URL endpoint from context
   const { token, loading: authLoading, API_BASE_URL } = useAuth();
@@ -130,7 +130,7 @@ export default function PatientHistoryRecords({ params }) {
           )}
         </div>
 
-        {/* Temporary floating alert notifying candidate of printing task dispatch */}
+        {/* Floating status alert for printing task dispatch */}
         {printSuccess && (
           <div className="p-3 mb-6 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center gap-2 text-xs font-bold animate-pulse">
             <CheckCircle2 className="h-4 w-4" />
@@ -177,7 +177,7 @@ export default function PatientHistoryRecords({ params }) {
                   <div>
                     {/* Badge */}
                     <span className="text-xxs font-extrabold uppercase tracking-widest text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
-                      Legacy App Clinical File
+                      Clinical Health Record
                     </span>
                     {/* Patient Name */}
                     <h1 className="text-3xl font-black text-slate-800 dark:text-slate-100 mt-2.5 leading-tight">

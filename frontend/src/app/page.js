@@ -114,9 +114,9 @@ export default function Home() {
               Transforming patient workflows with modern queue management.
             </h2>
             <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
-              Welcome to the HAQMS testing environment. This dashboard enables administrators, 
-              doctors, and receptionists to coordinate admissions, structure real-time queues, 
-              and display live token boards for patients.
+              Welcome to HAQMS. This platform enables healthcare administrators, 
+              physicians, and receptionists to coordinate patient care, schedule appointments, 
+              manage active queues, and display live calling monitors in real time.
             </p>
           </div>
 

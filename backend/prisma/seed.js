@@ -4,9 +4,18 @@ const bcrypt = require('bcryptjs');
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Seeding HAQMS database...');
+  console.log('🌱 Checking HAQMS database seed status...');
 
-  // Reset dependent seed data for idempotency on repeat runs
+  // If data already exists, skip destructive re-seeding to preserve live production records
+  const userCount = await prisma.user.count();
+  if (userCount > 0 && process.env.FORCE_SEED !== 'true') {
+    console.log(`ℹ️ Database already seeded (${userCount} users found). Skipping re-seed to preserve live records.`);
+    return;
+  }
+
+  console.log('🌱 Seeding initial HAQMS records...');
+
+  // Reset dependent seed data for idempotency on fresh/forced runs
   await prisma.queueToken.deleteMany({});
   await prisma.appointment.deleteMany({});
   await prisma.patient.deleteMany({});
@@ -206,7 +215,7 @@ async function main() {
         medicalHistory: 'Anxiety disorder (on Sertraline). Eczema flare-ups. No surgical history.',
       },
     }),
-    // Patients WITHOUT medical history — triggers frontend crash bug
+    // Patients without prior recorded medical history
     prisma.patient.create({
       data: {
         name: 'Bruce Wayne',

@@ -57,25 +57,8 @@ const authorize = (roles = []) => {
   };
 };
 
-// Define a legacy admin-only authorization middleware handler
-const authorizeAdminOnlyLegacy = (req, res, next) => {
-  // Check if req.user context exists
-  if (!req.user) {
-    // Block requests with a 401 Unauthorized response
-    return res.status(401).json({ error: 'Unauthorized.' });
-  }
-  // Validate that the authenticated user possesses the specific ADMIN role
-  if (req.user.role !== 'ADMIN') {
-    // Return a 403 Forbidden response if roles mismatch
-    return res.status(403).json({ error: 'Access denied. Admin only.' });
-  }
-  // Allow request to proceed to the database deletion handler
-  next();
-};
-
 // Export the middleware modules for consumption in routes
 module.exports = {
   authenticate,
   authorize,
-  authorizeAdminOnlyLegacy,
 };

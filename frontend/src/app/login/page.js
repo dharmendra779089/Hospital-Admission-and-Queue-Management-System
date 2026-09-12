@@ -79,9 +79,9 @@ export default function Login() {
         <h2 className="mt-6 text-3xl font-extrabold text-slate-800 dark:text-slate-100">
           Sign in to your account
         </h2>
-        {/* Subtitle helper directing candidates to pre-seeded mock user profiles */}
+        {/* Subtitle helper */}
         <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-          Or use one of the pre-seeded credentials in the README
+          Sign in to access your clinical dashboard or choose a demo role below
         </p>
       </div>
 
@@ -115,7 +115,7 @@ export default function Login() {
                 <input
                   id="email"
                   name="email"
-                  type="text" // Inconsistent: using text instead of email type to disable native validations
+                  type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="block w-full pl-10 pr-3 py-2 border border-slate-300 dark:border-slate-700 bg-white/50 dark:bg-slate-900/50 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-sm"
@@ -171,11 +171,11 @@ export default function Login() {
             </div>
           </form>
 
-          {/* Quick seeded login panel for convenient QA evaluations */}
+          {/* Quick seeded login panel for instant role-based testing */}
           <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800">
             <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Seeded Demo Credentials</h4>
             {/* Grid containing preset credentials buttons */}
-            <div className="grid grid-cols-2 gap-2 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
               {/* Preset 1: Admin */}
               <button
                 type="button"

@@ -29,7 +29,7 @@ router.get('/', authenticate, async (req, res) => {
       // Eagerly load details from the related patient and doctor models in a single query
       include: {
         patient: {
-          select: { id: true, name: true, phoneNumber: true, age: true, medicalHistory: true },
+          select: { id: true, name: true, phoneNumber: true, email: true, age: true, gender: true, medicalHistory: true },
         },
         doctor: {
           select: { id: true, name: true, specialization: true },
@@ -45,6 +45,7 @@ router.get('/', authenticate, async (req, res) => {
     });
   // Catch database execution exceptions
   } catch (error) {
+    console.error('Failed to retrieve appointments:', error);
     // Return a 500 status indicating query transaction failed
     res.status(500).json({ error: 'Failed to retrieve appointments' });
   }
@@ -65,6 +66,9 @@ router.post('/', authenticate, async (req, res) => {
 
     // Convert date string parameter into a standard JavaScript Date instance
     const appDate = new Date(appointmentDate);
+    if (isNaN(appDate.getTime())) {
+      return res.status(400).json({ error: 'Valid appointmentDate is required.' });
+    }
 
     // Check for an existing booking matching the same doctor and slot
     const existingSlot = await prisma.appointment.findFirst({
@@ -107,6 +111,7 @@ router.post('/', authenticate, async (req, res) => {
     res.status(201).json({ message: 'Appointment booked successfully', appointment });
   // Handle scheduling creation failures
   } catch (error) {
+    console.error('Failed to book appointment:', error);
     // Return a 500 status indicating insert transaction failed
     res.status(500).json({ error: 'Failed to book appointment' });
   }
@@ -125,6 +130,18 @@ router.patch('/:id', authenticate, async (req, res) => {
       return res.status(400).json({ error: 'Status is required' });
     }
 
+    const validStatuses = ['PENDING', 'CHECKED_IN', 'COMPLETED', 'CANCELLED'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ error: `Invalid status. Must be one of: ${validStatuses.join(', ')}` });
+    }
+
+    const existing = await prisma.appointment.findUnique({
+      where: { id: req.params.id },
+    });
+    if (!existing) {
+      return res.status(404).json({ error: 'Appointment not found' });
+    }
+
     // Execute the update operation targeting the unique appointment ID
     const updated = await prisma.appointment.update({
       where: { id: req.params.id },
@@ -135,6 +152,7 @@ router.patch('/:id', authenticate, async (req, res) => {
     res.json(updated);
   // Catch database execution exceptions
   } catch (error) {
+    console.error('Failed to update appointment:', error);
     // Return a 500 status indicating update transaction failed
     res.status(500).json({ error: 'Failed to update appointment' });
   }

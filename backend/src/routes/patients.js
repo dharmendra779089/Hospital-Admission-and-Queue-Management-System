@@ -14,10 +14,10 @@ router.get('/', authenticate, async (req, res) => {
   try {
     // Destructure search query, gender filter, and pagination values (default page=1, limit=5)
     const { search, gender, page = 1, limit = 5 } = req.query;
-    // Parse page query argument as an integer
-    const pageNum = parseInt(page);
-    // Parse limit query argument as an integer
-    const limitNum = parseInt(limit);
+    // Parse page query argument as an integer, guarding against NaN and negative values
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    // Parse limit query argument as an integer, capped between 1 and 100
+    const limitNum = Math.max(1, Math.min(100, parseInt(limit, 10) || 5));
     // Compute the SQL offset (skip) based on target page and page size
     const skip = (pageNum - 1) * limitNum;
 
@@ -66,6 +66,7 @@ router.get('/', authenticate, async (req, res) => {
     });
   // Handle database execution exceptions
   } catch (error) {
+    console.error('Failed to fetch patients:', error);
     // Return a 500 status indicating query execution failure
     res.status(500).json({ error: 'Failed to fetch patients' });
   }
@@ -92,8 +93,9 @@ router.get('/:id', authenticate, async (req, res) => {
     res.json(patient);
   // Catch database execution exceptions
   } catch (error) {
+    console.error('Failed to fetch patient details:', error);
     // Return a 500 status indicating query execution error
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Failed to fetch patient' });
   }
 });
 
@@ -110,13 +112,19 @@ router.post('/', authenticate, async (req, res) => {
       return res.status(400).json({ error: 'Name, phoneNumber, age, and gender are required.' });
     }
 
+    // Validate age as a positive integer
+    const parsedAge = parseInt(age, 10);
+    if (isNaN(parsedAge) || parsedAge < 0 || parsedAge > 150) {
+      return res.status(400).json({ error: 'Valid age between 0 and 150 is required.' });
+    }
+
     // Insert new patient record into the database table
     const patient = await prisma.patient.create({
       data: {
         name,
         email: email || null,
         phoneNumber,
-        age: parseInt(age),
+        age: parsedAge,
         gender,
         medicalHistory: medicalHistory || null,
       },
@@ -126,6 +134,7 @@ router.post('/', authenticate, async (req, res) => {
     res.status(201).json(patient);
   // Handle registration creation failure
   } catch (error) {
+    console.error('Failed to register patient:', error);
     // Return a 500 status indicating database insert failed
     res.status(500).json({ error: 'Failed to register patient' });
   }

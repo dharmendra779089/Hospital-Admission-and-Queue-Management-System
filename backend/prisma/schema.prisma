@@ -18,9 +18,6 @@ model User {
   doctor Doctor?
 }
 
-// SCHEMA BUG: No unique constraint on (doctorId, appointmentDate).
-// This permits double-booking the same physician at the exact same time slot.
-// A proper constraint would be: @@unique([doctorId, appointmentDate])
 model Doctor {
   id              String   @id @default(uuid())
   userId          String?  @unique
@@ -48,7 +45,7 @@ model Patient {
   phoneNumber    String
   age            Int
   gender         String
-  medicalHistory String?  // Nullable — intentional crash trigger for frontend bug
+  medicalHistory String?
   createdAt      DateTime @default(now())
 
   appointments Appointment[]

@@ -136,14 +136,12 @@ export function AuthProvider({ children }) {
       // Throw exception if backend returns registration validation failures
       if (!response.ok) throw new Error(data.error || "Registration failed");
       // Seamlessly log the user in immediately after successful registration
-      return login(email, password);
+      return await login(email, password);
     } catch (e) {
       // Cache registration exception details
       setError(e.message);
-      return { success: false, error: e.message };
-    } finally {
-      // Release loading flag
       setAuthState((prev) => ({ ...prev, loading: false }));
+      return { success: false, error: e.message };
     }
   };
 
@@ -166,5 +164,9 @@ export function AuthProvider({ children }) {
 
 // Expose custom hook for simple context consumption in child components
 export function useAuth() {
-  return useContext(AuthContext);
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 }

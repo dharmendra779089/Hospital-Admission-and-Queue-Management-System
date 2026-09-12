@@ -1,113 +1,160 @@
 # HAQMS: Hospital Appointment & Queue Management System
 
-Welcome to **HAQMS (Hospital Appointment & Queue Management System)**. This is a fully functional, deliberately imperfect full-stack web application designed for engineering internship candidate evaluations. 
+A production-grade, full-stack healthcare platform designed to streamline outpatient flow, appointment scheduling, and real-time consultation queues in clinical environments.
 
-Candidates are tasked with auditing the codebase to identify, debug, profile, secure, and optimize performance bottlenecks, memory leaks, concurrency issues, and security vulnerabilities.
+![HAQMS Reception Preview](frontend/public/hero-reception.png)
+
+---
+
+## 🌟 Key Highlights & Features
+
+- **Live Public Calling Board (`/queue`)**:
+  - Full-screen digital display for waiting rooms showing active calling tokens, doctor assignments, and patient queue status in real time.
+- **Receptionist Scheduling Engine**:
+  - Direct walk-in patient registration, quick slot booking with calendar pickers, and instant queue check-in.
+- **Doctor Consultation Worklist**:
+  - Live patient queue tracker with one-click status transitions (`Calling`, `Completed`, `Skipped`), consultation histories, and instant patient file access.
+- **Clinical Health Archive (`/patients/[id]/history-records`)**:
+  - Deep-dive diagnostic records, chronic condition tracking, appointment history timelines, and printable diagnostic summaries.
+- **Administrative Intelligence & Reporting**:
+  - High-level executive dashboard aggregating physician revenue, appointment completion rates, and daily department throughput.
+- **Role-Based Access Control (RBAC)**:
+  - Secure stateless JWT authentication with role authorization (`ADMIN`, `DOCTOR`, `RECEPTIONIST`) and bcrypt password hashing.
+- **Race-Condition & Double-Booking Protection**:
+  - Serializable Prisma database transactions (`$transaction`) prevent duplicate queue tokens; database-level unique constraints (`@@unique([doctorId, appointmentDate])`) eliminate double-booking.
 
 ---
 
 ## 🛠️ Tech Stack
-- **Frontend**: Next.js (App Router, Tailwind CSS, Lucide icons, Context API)
-- **Backend**: Node.js + Express
-- **Database & ORM**: PostgreSQL + Prisma ORM (`provider = "postgresql"`)
-- **Process Management**: Docker Compose (Local PostgreSQL helper)
-- **Cloud Infrastructure**: Render (`render.yaml` Blueprint with Render Managed PostgreSQL)
+
+| Layer | Technology |
+|---|---|
+| **Frontend** | [Next.js 15 (App Router)](https://nextjs.org/), [React 19](https://react.dev/), [Tailwind CSS](https://tailwindcss.com/), [Lucide Icons](https://lucide.dev/) |
+| **Backend** | [Node.js](https://nodejs.org/) + [Express](https://expressjs.com/) |
+| **Database & ORM** | [PostgreSQL](https://www.postgresql.org/) + [Prisma ORM](https://www.prisma.io/) |
+| **Authentication** | [jsonwebtoken (HS256)](https://github.com/auth0/node-jsonwebtoken) + [bcryptjs](https://github.com/dcodeIO/bcrypt.js) |
+| **Cloud Deployment** | [Render](https://render.com/) Infrastructure-as-Code via `render.yaml` (Managed PostgreSQL + Web Services) |
 
 ---
 
-## 🚀 Getting Started & Setup
+## 📁 Project Architecture
 
-Follow these steps to spin up the local development workspace:
-
-### 1. Auto-Install Dependencies
-Run the included workspace orchestrator bootstrap script to install packages in the root, frontend, and backend packages:
-```bash
-chmod +x setup.sh
-./setup.sh
+```text
+HAQMS/
+├── backend/                  # Express REST API & Database Layer
+│   ├── prisma/
+│   │   ├── schema.prisma     # PostgreSQL schema definitions & indices
+│   │   └── seed.js           # Database seed script with mock doctors & patients
+│   ├── src/
+│   │   ├── middleware/       # JWT authentication & RBAC middleware
+│   │   ├── routes/           # API routes (appointments, auth, doctors, patients, queue, reports)
+│   │   └── index.js          # Express app entrypoint & CORS configuration
+│   └── package.json
+│
+├── frontend/                 # Next.js 15 Client Application
+│   ├── public/               # Static assets
+│   ├── src/
+│   │   ├── app/              # Next.js App Router (dashboard, login, queue, patients)
+│   │   ├── components/       # UI layout components
+│   │   └── context/          # Global React AuthContext
+│   └── package.json
+│
+├── render.yaml               # Infrastructure-as-Code Blueprint for Render deployment
+└── package.json              # Monorepo root workspace orchestrator
 ```
 
-### 2. Launch the Database
-You need a running PostgreSQL server. If you have Docker installed, you can spin up the preconfigured container:
+---
+
+## ☁️ Deploying to Render (One-Click Blueprint)
+
+The project includes a pre-configured `render.yaml` Infrastructure-as-Code Blueprint that sets up everything automatically:
+1. **Managed PostgreSQL**: Creates a managed `haqms-db` instance on Render.
+2. **Backend Web Service (`haqms-backend`)**:
+   - Automatically links `DATABASE_URL` from the managed database.
+   - Generates a secure `JWT_SECRET`.
+   - Runs Prisma migrations and database seed automatically on build/startup.
+3. **Frontend Web Service (`haqms-frontend`)**:
+   - Injects `NEXT_PUBLIC_API_URL` pointing to the live backend service.
+   - Builds and serves the Next.js production bundle.
+
+### Steps to Deploy:
+1. Push your repository to **GitHub**.
+2. Log in to [Render Dashboard](https://dashboard.render.com/).
+3. Click **New +** → **Blueprint**.
+4. Select your **HAQMS** repository and click **Apply**.
+5. Render will automatically provision the PostgreSQL database, deploy the backend API, and deploy the frontend client.
+
+---
+
+## 💻 Local Development Setup
+
+### 1. Prerequisites
+- **Node.js**: v18.0.0 or higher
+- **PostgreSQL**: Local PostgreSQL instance or cloud database (e.g., Render Managed PostgreSQL)
+
+### 2. Clone & Install Dependencies
 ```bash
-docker-compose up -d
+# Clone the repository
+git clone https://github.com/your-username/HAQMS.git
+cd HAQMS
+
+# Install root, backend, and frontend dependencies
+npm run install:all
 ```
-Alternatively, configure your local PostgreSQL server and ensure the connection URL is set in `backend/.env`:
+
+### 3. Start Database
+Ensure your PostgreSQL server (local or hosted on Render) is running and configure `backend/.env`:
 ```env
+PORT=5000
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/haqms?schema=public"
+JWT_SECRET="super-secret-jwt-key"
+FRONTEND_URL="http://localhost:3000"
 ```
 
-### 3. Deploy Schema & Seed Mock Data
-Apply Prisma schema migrations to the database and populate it with pre-built mock records (including administrative logins, medical histories, physician slots, and queue tokens):
+### 4. Migrate and Seed the Database
 ```bash
 npm run db:setup --prefix backend
 ```
 
-### 4. Boot Dev Servers
-Launch both the Next.js development client (port `3000`) and the Express API server (port `5000`) concurrently using:
+### 5. Launch Development Servers
+Run both frontend and backend concurrently:
 ```bash
 npm run dev
 ```
+- **Frontend**: [http://localhost:3000](http://localhost:3000)
+- **Backend API**: [http://localhost:5000](http://localhost:5000)
 
 ---
 
-## ☁️ Cloud Deployment (Render)
+## 🔑 Pre-Seeded Demo Credentials
 
-The project includes a pre-configured Render Blueprint (`render.yaml`):
+All seeded accounts use the password: **`password123`**
 
-1. **Managed PostgreSQL**: Automatically provisions a Render Managed PostgreSQL database (`haqms-db`).
-2. **Backend Service (`haqms-backend`)**: Connects to `haqms-db` via environment variable injection (`DATABASE_URL`), applies Prisma database migrations, seeds mock data, and starts the Express API server.
-3. **Frontend Service (`haqms-frontend`)**: Builds and serves the Next.js production client.
-
-To deploy on Render:
-- Connect your GitHub repository to Render.
-- Deploy using the root `render.yaml` Blueprint.
-
----
-
-## 🔑 Pre-Seeded Accounts
-The database seed script populates the database with default accounts (All passwords are **`password123`**):
-
-| Role | Email | Purpose / Flow Testing |
+| Role | Email | Features / Capabilities |
 |---|---|---|
-| **Administrator** | `admin@haqms.com` | Access system reports, view audit logs, view full physician registries |
-| **Receptionist** | `reception1@haqms.com` | Register patients, book slots, perform direct queue check-in |
-| **Doctor** | `doctor1@haqms.com` | View daily patient worklist, manage active calling monitors, read history |
+| **Administrator** | `admin@haqms.com` | Access system metrics, physician revenue reports, full patient registry |
+| **Receptionist** | `reception1@haqms.com` | Register patients, book appointments, issue direct queue tokens |
+| **Doctor** | `doctor1@haqms.com` | Manage active consultation queue (`Calling`, `Completed`), view medical records |
 
 ---
 
-## 🎯 Internship Evaluation Tasks
+## 📡 REST API Reference
 
-As an internship candidate, your evaluation is divided into five core objectives:
-
-### 🔍 Challenge 1: Security Audit
-Identify and patch several production-level security bugs:
-- **Credential Logging**: Find where raw user passwords are logged in plain text.
-- **Leaky Token Signature**: Audit how JWTs are signed, stored, and verified.
-- **SQL Injection**: Locate the search input vulnerable to SQL injection and rewrite it using parameterized queries.
-- **Bypassed Authorization**: Find the admin action endpoint that fails to enforce actual role authorizations.
-
-### ⚡ Challenge 2: Backend Performance & Concurrency
-Analyze and optimize backend logic:
-- **N+1 Database Queries**: Identify the endpoint fetching core list elements but executing separate queries per row in a loop.
-- **Event-Loop Blocking**: Locate sequential async database queries where parallel triggers should be utilized.
-- **Slow aggregation endpoint**: Fix the slow nested report endpoint that locks the event loop.
-- **Check-in Token Race Condition**: Find why concurrent direct check-ins assign duplicate token numbers and patch it using transaction locks or auto-increment sequences.
-
-### 💾 Challenge 3: Database & Schema Optimization
-Refactor DB layers:
-- **Schema Vulnerabilities**: Locate the missing constraints that permit double-booking the same physician at the exact same millisecond slot.
-- **Missing Indices**: Add appropriate indices to speed up foreign key relationships and status filters under load.
-- **Paging Optimization**: Fix the listing route that performs in-memory pagination slicing instead of SQL pagination.
-
-### 🖥️ Challenge 4: Frontend Memory & React Optimization
-Examine frontend React components:
-- **Severe Memory Leak**: Navigate to the Live Public Queue Board (`/queue`). Mount and unmount it repeatedly. Find the leak in `src/app/queue/page.js` and patch it.
-- **Unnecessary Re-renders**: Optimize search input fields that trigger complete list re-renders on every single keystroke.
-- **NULL Value Application Crash**: Log in as a Doctor (`doctor1@haqms.com`), click on one of the patients with a blank medical history (e.g., Clark Kent or Bruce Wayne), and diagnose why the entire React app crashes on rendering.
-
-### 🏗️ Challenge 5: Incomplete Feature Delivery
-- **Resolve styled 404 error**: Clicking "View Diagnostic Reports Details (Legacy App)" on a patient profile triggers a 404 page. Your final task is to build out that missing page (`src/app/patients/[id]/history-records/page.js`) to fetch and render the patient clinical record.
+| Endpoint | Method | Role Required | Description |
+|---|---|---|---|
+| `/api/auth/login` | `POST` | Public | Authenticate user & receive JWT token |
+| `/api/auth/register` | `POST` | Public | Register new staff or patient account |
+| `/api/doctors` | `GET` | Public | Search and list doctors by name or department |
+| `/api/patients` | `GET` | Authenticated | Paginated list of patients with search filtering |
+| `/api/patients/:id` | `GET` | Authenticated | Fetch complete patient diagnostic history |
+| `/api/appointments` | `GET` | Authenticated | Filter appointments by date and physician |
+| `/api/appointments` | `POST` | Receptionist / Admin | Create a confirmed patient appointment |
+| `/api/queue/today` | `GET` | Public | Live queue token board for today's consultations |
+| `/api/queue/checkin` | `POST` | Receptionist / Admin | Atomic queue check-in with auto-sequenced token |
+| `/api/queue/:id/status` | `PATCH` | Doctor / Receptionist | Update token status (`WAITING`, `CALLING`, `COMPLETED`, `SKIPPED`) |
+| `/api/reports/doctor-stats`| `GET` | Admin | Aggregate doctor revenue, appointments, and queue volume |
 
 ---
 
-Good luck! You will be evaluated based on the cleanliness, correctness, efficiency, and safety of your refactoring.
+## 📄 License
+This project is open-source and available under the [MIT License](LICENSE).

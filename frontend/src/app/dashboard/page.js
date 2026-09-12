@@ -43,6 +43,8 @@ export default function Dashboard() {
   // STATE FOR RECEPTIONIST WORKFLOWS
   // State storing the paginated patients array
   const [patients, setPatients] = useState([]);
+  // State storing all registered patients for selection dropdowns (independent of directory pagination/search)
+  const [allPatientsList, setAllPatientsList] = useState([]);
   // State tracking patient database fetch activity
   const [patientsLoading, setPatientsLoading] = useState(false);
   // State holding gender filters for search queries
@@ -83,7 +85,7 @@ export default function Dashboard() {
   const [checkinMessage, setCheckinMessage] = useState('');
 
   // STATE FOR DOCTOR WORKFLOWS
-  // State tracking the doctor's scheduled appointments for today
+  // State tracking scheduled appointments
   const [doctorAppointments, setDoctorAppointments] = useState([]);
   // State tracking active calling and waiting queue tokens under this doctor
   const [doctorQueue, setDoctorQueue] = useState([]);
@@ -130,6 +132,21 @@ export default function Dashboard() {
     }
   }, [API_BASE_URL, token, patientSearch, patientGender]);
 
+  // Fetch all registered patients for scheduling dropdown options (independent of table pagination)
+  const fetchAllPatientsDropdown = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/patients?page=1&limit=100`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (data.success && Array.isArray(data.patients)) {
+        setAllPatientsList(data.patients);
+      }
+    } catch (e) {
+      console.error('Failed to fetch all patients for dropdown:', e);
+    }
+  }, [API_BASE_URL, token]);
+
   // Fetch all registered physicians for scheduling dropdown options
   const fetchDoctorsDropdown = useCallback(async () => {
     try {
@@ -145,31 +162,49 @@ export default function Dashboard() {
     }
   }, [API_BASE_URL, token]);
 
-  // Pull doctor-specific appointments and queue tokens in parallel
-  const fetchDoctorWorklist = useCallback(async () => {
+  // Pull appointments worklist (scoped to doctor for DOCTOR role, or full list for RECEPTIONIST / ADMIN)
+  const fetchAppointmentsWorklist = useCallback(async () => {
+    if (!user || !token) return;
+    try {
+      let url = `${API_BASE_URL}/appointments`;
+      if (user.role === 'DOCTOR') {
+        const matchedDoc = doctorsList.find((d) => d.userId === user.id);
+        if (!matchedDoc) return;
+        url += `?doctorId=${matchedDoc.id}`;
+      }
+      const res = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (data.success && Array.isArray(data.appointments)) {
+        setDoctorAppointments(data.appointments);
+      }
+    } catch (e) {
+      console.error('Failed to fetch appointments worklist:', e);
+    }
+  }, [API_BASE_URL, token, user, doctorsList]);
+
+  // Pull doctor-specific active calling and waiting queue tokens
+  const fetchDoctorQueue = useCallback(async () => {
     if (user?.role !== 'DOCTOR') return;
     try {
       const matchedDoc = doctorsList.find((d) => d.userId === user.id);
       if (!matchedDoc) return;
 
-      const [appRes, queueRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/appointments?doctorId=${matchedDoc.id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-        fetch(`${API_BASE_URL}/queue?doctorId=${matchedDoc.id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-      ]);
-
-      const appData = await appRes.json();
-      if (appData.success) setDoctorAppointments(appData.appointments);
-
+      const queueRes = await fetch(`${API_BASE_URL}/queue?doctorId=${matchedDoc.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const queueData = await queueRes.json();
       if (Array.isArray(queueData)) setDoctorQueue(queueData);
     } catch (e) {
-      console.error('Failed to fetch doctor worklist:', e);
+      console.error('Failed to fetch doctor queue:', e);
     }
   }, [API_BASE_URL, token, user, doctorsList]);
+
+  // Unified worklist refresher
+  const fetchDoctorWorklist = useCallback(async () => {
+    await Promise.all([fetchAppointmentsWorklist(), fetchDoctorQueue()]);
+  }, [fetchAppointmentsWorklist, fetchDoctorQueue]);
 
   // ==========================================
   // EFFECTS — also before early return
@@ -196,11 +231,14 @@ export default function Dashboard() {
     if (user.role === 'RECEPTIONIST' || user.role === 'ADMIN') {
       let isSubscribed = true;
       Promise.resolve().then(() => {
-        if (isSubscribed) fetchPatients(1);
+        if (isSubscribed) {
+          fetchPatients(1);
+          fetchAllPatientsDropdown();
+        }
       });
       return () => { isSubscribed = false; };
     }
-  }, [user, token, fetchPatients]);
+  }, [user, token, fetchPatients, fetchAllPatientsDropdown]);
 
   // Fetch doctor dropdown datasets on initial load
   useEffect(() => {
@@ -212,17 +250,20 @@ export default function Dashboard() {
     return () => { isSubscribed = false; };
   }, [user, token, fetchDoctorsDropdown]);
 
-  // Fetch doctor active queue worklists on mount
+  // Fetch active appointments and queue worklists
   useEffect(() => {
     if (!user || !token) return;
-    if (user.role === 'DOCTOR' && doctorsList.length > 0) {
-      let isSubscribed = true;
-      Promise.resolve().then(() => {
-        if (isSubscribed) fetchDoctorWorklist();
-      });
-      return () => { isSubscribed = false; };
-    }
-  }, [user, token, doctorsList, fetchDoctorWorklist]);
+    let isSubscribed = true;
+    Promise.resolve().then(() => {
+      if (isSubscribed) {
+        fetchAppointmentsWorklist();
+        if (user.role === 'DOCTOR' && doctorsList.length > 0) {
+          fetchDoctorQueue();
+        }
+      }
+    });
+    return () => { isSubscribed = false; };
+  }, [user, token, doctorsList, fetchAppointmentsWorklist, fetchDoctorQueue]);
 
   // Prevent UI rendering before user context resolves
   if (loading) {
@@ -298,6 +339,7 @@ export default function Dashboard() {
         setRegHistory('');
         // Re-fetch patient list to update grid directory
         fetchPatients(1);
+        fetchAllPatientsDropdown();
       } else {
         // Capture error explanation
         setRegMessage(`Error: ${data.error || 'Failed to register'}`);
@@ -345,8 +387,9 @@ export default function Dashboard() {
         setBookingMessage('Success: Appointment booked successfully!');
         // Clear objective reason text area
         setBookingReason('');
-        // If logged-in user is a doctor, refresh current dashboard queues
-        if (user.role === 'DOCTOR') fetchDoctorWorklist();
+        // Refresh appointments list
+        fetchAppointmentsWorklist();
+        if (user.role === 'DOCTOR') fetchDoctorQueue();
       } else {
         // Show validation errors
         setBookingMessage(`Error: ${data.error || 'Failed to book'}`);
@@ -373,6 +416,7 @@ export default function Dashboard() {
       if (res.ok) {
         alert(data.message || 'Patient deleted.');
         fetchPatients(patientsPagination.page);
+        fetchAllPatientsDropdown();
       } else {
         alert(`Error: ${data.error || 'Deletion failed.'}`);
       }
@@ -401,12 +445,13 @@ export default function Dashboard() {
       // Verify success
       if (res.ok) {
         // Expose newly generated token metadata
-        setCheckinMessage(`Checked in! Generated Token #${data.token.tokenNumber}`);
-        // If practitioner is check-in operator, refresh queue dashboard views
-        if (user.role === 'DOCTOR') fetchDoctorWorklist();
+        setCheckinMessage(`Checked in! Generated Token #${data.token?.tokenNumber || ''}`);
+        // Refresh appointment and queue lists
+        fetchAppointmentsWorklist();
+        if (user.role === 'DOCTOR') fetchDoctorQueue();
       } else {
         // Render checkin error feedback
-        setCheckinMessage(`Error check-in: ${data.error}`);
+        setCheckinMessage(`Error check-in: ${data.error || 'Check-in failed'}`);
       }
     } catch (err) {
       // Display connection exceptions
@@ -431,7 +476,10 @@ export default function Dashboard() {
         body: JSON.stringify({ status: newStatus }),
       });
       // Refresh practitioner queues list if patch finishes successfully
-      if (res.ok) fetchDoctorWorklist();
+      if (res.ok) {
+        fetchAppointmentsWorklist();
+        if (user.role === 'DOCTOR') fetchDoctorQueue();
+      }
     } catch (e) {
       // Log errors
       console.error(e);
@@ -451,7 +499,10 @@ export default function Dashboard() {
         body: JSON.stringify({ status: 'COMPLETED' }),
       });
       // Refresh doctor lists
-      if (res.ok) fetchDoctorWorklist();
+      if (res.ok) {
+        fetchAppointmentsWorklist();
+        if (user.role === 'DOCTOR') fetchDoctorQueue();
+      }
     } catch (e) {
       // Log errors
       console.error(e);
@@ -554,6 +605,13 @@ export default function Dashboard() {
                 className={`py-3.5 px-1 border-b-2 font-bold text-sm transition-all whitespace-nowrap ${activeTab === 'book' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-slate-400'}`}
               >
                 Scheduling / Check-in Portal
+              </button>
+              {/* Tab 5: Scheduled Bookings */}
+              <button
+                onClick={() => setActiveTab('appointments')}
+                className={`py-3.5 px-1 border-b-2 font-bold text-sm transition-all whitespace-nowrap ${activeTab === 'appointments' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-slate-400'}`}
+              >
+                Scheduled Bookings
               </button>
             </>
           )}
@@ -673,7 +731,7 @@ export default function Dashboard() {
                                 <button
                                   onClick={() => {
                                     setWalkinPatientId(p.id);
-                                    setActiveTab('walkin');
+                                    setActiveTab('book');
                                   }}
                                   className="text-xxs px-2.5 py-1 rounded bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold hover:bg-indigo-500 hover:text-white transition-colors"
                                   title="Check in patient for walk-in consultation"
@@ -863,7 +921,7 @@ export default function Dashboard() {
                     className="block w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-white/50 dark:bg-slate-900/50 rounded-lg text-slate-900 dark:text-slate-100 text-sm focus:outline-none"
                   >
                     <option value="">-- Choose Patient --</option>
-                    {patients.map((p) => (
+                    {(allPatientsList.length > 0 ? allPatientsList : patients).map((p) => (
                       <option key={p.id} value={p.id}>{p.name} ({p.phoneNumber})</option>
                     ))}
                   </select>
@@ -948,8 +1006,8 @@ export default function Dashboard() {
                       className="block w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-white/50 dark:bg-slate-900/50 rounded-lg text-slate-900 dark:text-slate-100 text-sm focus:outline-none"
                     >
                       <option value="">-- Choose Patient --</option>
-                      {patients.map((p) => (
-                        <option key={p.id} value={p.id}>{p.name}</option>
+                      {(allPatientsList.length > 0 ? allPatientsList : patients).map((p) => (
+                        <option key={p.id} value={p.id}>{p.name} ({p.phoneNumber})</option>
                       ))}
                     </select>
                   </div>
@@ -991,19 +1049,21 @@ export default function Dashboard() {
         )}
 
         {/* ==============================================================
-            TAB: DOCTOR WORKLIST - APPOINTMENTS (DOCTOR ROLE)
+            TAB: SCHEDULED BOOKINGS (ALL ROLES)
             ============================================================== */}
         {activeTab === 'appointments' && (
           <div className="space-y-6">
             <div className="glass p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-md">
               <h3 className="text-lg font-extrabold text-slate-800 dark:text-slate-100 flex items-center gap-2 mb-4">
                 <CalendarDays className="h-5 w-5 text-indigo-600" />
-                Scheduled Daily Bookings List
+                {user.role === 'DOCTOR' ? 'My Scheduled Bookings' : 'Scheduled Daily Bookings List'}
               </h3>
 
               {/* Renders appointments table or empty placeholder */}
               {doctorAppointments.length === 0 ? (
-                <p className="text-center py-6 text-slate-400 text-sm">No appointments scheduled for you today.</p>
+                <p className="text-center py-6 text-slate-400 text-sm">
+                  {user.role === 'DOCTOR' ? 'No appointments scheduled for you today.' : 'No scheduled appointments recorded.'}
+                </p>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-800 text-sm text-left">
@@ -1012,6 +1072,7 @@ export default function Dashboard() {
                       <tr className="text-slate-400 uppercase tracking-widest text-xxs font-bold border-b border-slate-200 dark:border-slate-800">
                         <th className="pb-3">Time</th>
                         <th className="pb-3">Patient</th>
+                        {user.role !== 'DOCTOR' && <th className="pb-3">Physician</th>}
                         <th className="pb-3">Consultation Reason</th>
                         <th className="pb-3">Status</th>
                         <th className="pb-3 text-right">Actions</th>
@@ -1022,18 +1083,29 @@ export default function Dashboard() {
                         <tr key={app.id} className="hover:bg-slate-500/5 transition-colors">
                           {/* Appt scheduled time */}
                           <td className="py-3.5 font-mono font-bold text-slate-800 dark:text-slate-200">
-                            {new Date(app.appointmentDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            {new Date(app.appointmentDate).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}
                           </td>
                           {/* Clickable Patient profile trigger */}
                           <td className="py-3.5">
                             <button
                               onClick={() => setSelectedPatientHistory(app.patient)}
-                              className="font-bold text-indigo-600 hover:underline hover:text-indigo-700 transition-colors"
+                              className="font-bold text-indigo-600 hover:underline hover:text-indigo-700 transition-colors text-left"
                             >
                               {app.patient ? app.patient.name : 'Unknown Patient'}
                             </button>
-                            <span className="block text-xxs text-slate-400 mt-0.5">Age: {app.patient?.age}</span>
+                            <span className="block text-xxs text-slate-400 mt-0.5">
+                              Age: {app.patient?.age || 'N/A'} {app.patient?.gender ? `(${app.patient.gender})` : ''}
+                            </span>
                           </td>
+                          {/* Physician (visible to receptionists & admin) */}
+                          {user.role !== 'DOCTOR' && (
+                            <td className="py-3.5 font-semibold text-slate-800 dark:text-slate-200">
+                              {app.doctor ? app.doctor.name : 'Unassigned'}
+                              <span className="block text-xxs text-indigo-600 dark:text-indigo-400 font-normal mt-0.5">
+                                {app.doctor?.specialization}
+                              </span>
+                            </td>
+                          )}
                           {/* Reason */}
                           <td className="py-3.5 text-slate-500 dark:text-slate-400 font-semibold">{app.reason || 'None provided'}</td>
                           {/* Status Badge */}
@@ -1049,20 +1121,21 @@ export default function Dashboard() {
                                 {/* Check patient into live queue board */}
                                 <button
                                   onClick={() => {
-                                    const matchedDoc = doctorsList.find((d) => d.userId === user.id);
-                                    if (matchedDoc) handleQueueCheckin(app.patientId, matchedDoc.id, app.id);
+                                    handleQueueCheckin(app.patientId, app.doctorId, app.id);
                                   }}
                                   className="text-xxs px-2.5 py-1 rounded bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-extrabold hover:bg-indigo-500 hover:text-white transition-colors"
                                 >
                                   Check In Patient
                                 </button>
                                 {/* Mark appointment complete */}
-                                <button
-                                  onClick={() => handleCompleteAppointment(app.id)}
-                                  className="text-xxs px-2.5 py-1 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-extrabold hover:bg-indigo-500 hover:text-white transition-colors"
-                                >
-                                  Complete
-                                </button>
+                                {(user.role === 'DOCTOR' || user.role === 'ADMIN') && (
+                                  <button
+                                    onClick={() => handleCompleteAppointment(app.id)}
+                                    className="text-xxs px-2.5 py-1 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-extrabold hover:bg-indigo-500 hover:text-white transition-colors"
+                                  >
+                                    Complete
+                                  </button>
+                                )}
                               </>
                             )}
                           </td>
@@ -1104,13 +1177,13 @@ export default function Dashboard() {
                   </p>
                 </div>
 
-                {/* Navigation link to legacy details view */}
+                {/* Navigation link to full clinical records view */}
                 <div className="pt-2 flex justify-between items-center text-xs">
                   <Link
                     href={`/patients/${selectedPatientHistory.id}/history-records`}
                     className="text-indigo-600 font-extrabold hover:underline flex items-center gap-1"
                   >
-                    View Diagnostic Reports Details (Legacy App)
+                    View Full Clinical Health Records
                     <ArrowRight className="h-3 w-3" />
                   </Link>
                 </div>

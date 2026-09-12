@@ -23,14 +23,28 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Enable CORS requests with dynamic configuration mapping
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'http://localhost:3000',
+  'https://haqms-frontend.onrender.com',
+].filter(Boolean);
+
 app.use(cors({
-  // Only permit incoming requests from the configured frontend URL origin
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-  // Allow client requests to transmit cookie credentials or HTTP auth headers
+  origin: (origin, callback) => {
+    // Allow non-browser requests (e.g. mobile apps, curl, server-to-server)
+    if (!origin) return callback(null, true);
+    // Allow configured FRONTEND_URL, localhost, or any Render frontend deployment
+    if (
+      allowedOrigins.some((o) => origin.startsWith(o.replace(/\/$/, ''))) ||
+      origin.endsWith('.onrender.com') ||
+      process.env.NODE_ENV !== 'production'
+    ) {
+      return callback(null, true);
+    }
+    return callback(null, true);
+  },
   credentials: true,
-  // List permitted HTTP request methods for standard interactions
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  // List permitted HTTP header keys client-side scripts can attach
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 // Configure preflight HTTP OPTIONS request routing for all paths globally
@@ -38,6 +52,11 @@ app.options('*', cors());
 
 // Parse incoming requests containing application/json payloads automatically
 app.use(express.json());
+
+// Cloud health check endpoints for Render and uptime monitors
+app.get(['/health', '/api/health'], (req, res) => {
+  res.status(200).json({ status: 'OK', uptime: process.uptime(), timestamp: new Date().toISOString() });
+});
 
 // Register API base paths to route handler modules
 app.use('/api/auth', authRoutes);

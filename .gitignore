@@ -1,5 +1,12 @@
 node_modules/
 frontend/.next/
+frontend/out/
 backend/node_modules/
 .env
+.env.*
+*.env
+**/.env
+**/.env.*
 backend/prisma/*.db
+.DS_Store
+Thumbs.db
